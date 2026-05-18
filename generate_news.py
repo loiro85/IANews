@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Genera index.html con las noticias del día para GitHub Pages.
-Extrae el texto completo de cada artículo con trafilatura.
+Fuentes en inglés se traducen automáticamente al español.
 Se ejecuta diariamente vía GitHub Actions.
 """
 
@@ -14,57 +14,82 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
+import requests as _req
 import trafilatura
+from deep_translator import GoogleTranslator
 
-# ─── Feeds ────────────────────────────────────────────────────────────────────
+# ─── Fuentes ──────────────────────────────────────────────────────────────────
+# Tuplas (url, idioma). "en" → se traduce automáticamente al español.
 
 GENERAL_FEEDS = [
-    "https://news.google.com/rss?hl=es&gl=ES&ceid=ES:es",
-    "https://feeds.bbci.co.uk/mundo/rss.xml",
-    "https://rss.elpais.com/rss/elpais/portada.xml",
+    # Fuentes españolas e hispanas — sin traducción
+    ("https://feeds.elpais.com/rss/elpais/portada.xml",          "es"),
+    ("https://feeds.elpais.com/rss/elpais/internacional.xml",    "es"),
+    ("https://rss.elconfidencial.com/espana/",                   "es"),
+    ("https://rss.dw.com/rdf/rss-es-all",                        "es"),  # Deutsche Welle
+    ("https://feeds.bbci.co.uk/mundo/rss.xml",                   "es"),  # BBC Mundo
+    # Fuentes internacionales en inglés — se traducen
+    ("https://www.theguardian.com/world/rss",                    "en"),  # The Guardian
+    ("https://feeds.bbci.co.uk/news/world/rss.xml",              "en"),  # BBC World
 ]
 
 TECH_FEEDS = [
-    "https://news.google.com/rss/search?q=tecnolog%C3%ADa+inteligencia+artificial+innovaci%C3%B3n&hl=es&gl=ES&ceid=ES:es",
-    "https://feeds.xataka.com/xataka/portada",
-    "https://www.genbeta.com/rss",
+    # Español
+    ("https://feeds.xataka.com/xataka/portada",                  "es"),
+    # Inglés — se traducen
+    ("https://www.theverge.com/rss/index.xml",                   "en"),  # The Verge
+    ("https://feeds.arstechnica.com/arstechnica/index",          "en"),  # Ars Technica
+    ("https://www.tomshardware.com/feeds/all",                   "en"),  # Tom's Hardware (Nvidia/Intel/AMD)
+    ("https://9to5mac.com/feed/",                                "en"),  # Apple / iOS
+    ("https://www.engadget.com/rss.xml",                         "en"),  # Engadget
 ]
 
 SPORTS_CONFIG = {
     "Formula 1": {
-        "feeds": ["https://news.google.com/rss/search?q=Formula+1+F1+Gran+Premio&hl=es&gl=ES&ceid=ES:es"],
-        "limit": 3,
-        "color": "#E10600",
-        "icon": "🏎️",
+        "feeds": [
+            ("https://news.google.com/rss/search?q=Formula+1+F1+Gran+Premio&hl=es&gl=ES&ceid=ES:es", "es"),
+            ("https://feeds.bbci.co.uk/sport/formula1/rss.xml", "en"),
+        ],
+        "limit": 3, "color": "#E10600", "icon": "🏎️",
     },
     "MotoGP": {
-        "feeds": ["https://news.google.com/rss/search?q=MotoGP+Gran+Premio+moto&hl=es&gl=ES&ceid=ES:es"],
-        "limit": 2,
-        "color": "#FF6B00",
-        "icon": "🏍️",
+        "feeds": [
+            ("https://news.google.com/rss/search?q=MotoGP+Gran+Premio+moto&hl=es&gl=ES&ceid=ES:es", "es"),
+        ],
+        "limit": 2, "color": "#FF6B00", "icon": "🏍️",
     },
     "Formula E": {
-        "feeds": ['https://news.google.com/rss/search?q=%22Formula+E%22+ABB+el%C3%A9ctrico&hl=es&gl=ES&ceid=ES:es'],
-        "limit": 2,
-        "color": "#00B4D8",
-        "icon": "⚡",
+        "feeds": [
+            ("https://news.google.com/rss/search?q=%22Formula+E%22+ABB+el%C3%A9ctrico&hl=es&gl=ES&ceid=ES:es", "es"),
+        ],
+        "limit": 2, "color": "#00B4D8", "icon": "⚡",
     },
     "Fútbol": {
         "feeds": [
-            "https://news.google.com/rss/search?q=Champions+League+LaLiga+Premier+Bundesliga+Serie+A+UEFA&hl=es&gl=ES&ceid=ES:es",
-            "https://feeds.as.com/mrss-s/pages/as/site/as.com/portada/",
+            ("https://feeds.as.com/mrss-s/pages/as/site/as.com/portada/", "es"),
+            ("https://feeds.bbci.co.uk/sport/football/rss.xml",           "en"),  # BBC Sport
+            ("https://www.skysports.com/rss/12040",                       "en"),  # Sky Sports
         ],
-        "limit": 3,
-        "color": "#16A34A",
-        "icon": "⚽",
+        "limit": 5, "color": "#16A34A", "icon": "⚽",
     },
 }
 
-AGENT = "Mozilla/5.0 (compatible; NewsAggregator/1.0)"
-MAX_CONTENT_CHARS = 5000  # ~800 palabras, cubre la mayoría de noticias completas
+MAX_CONTENT_CHARS = 5000
+
+_BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "DNT": "1",
+}
 
 
-# ─── Fetch RSS ────────────────────────────────────────────────────────────────
+# ─── RSS helpers ──────────────────────────────────────────────────────────────
 
 def _strip_html(text):
     return re.sub(r"<[^>]+>", " ", text).strip()
@@ -89,11 +114,12 @@ def _rss_summary(entry):
     return html_module.unescape(_strip_html(raw)).strip()
 
 
-def fetch_items(urls, limit=15):
+def fetch_items(feed_specs, limit=15):
+    """feed_specs: list of (url, lang) tuples."""
     items, seen = [], set()
-    for url in urls:
+    for url, lang in feed_specs:
         try:
-            feed = feedparser.parse(url, agent=AGENT)
+            feed = feedparser.parse(url, agent=_BROWSER_HEADERS["User-Agent"])
             for entry in feed.entries:
                 raw = entry.get("title", "").strip()
                 if not raw:
@@ -104,12 +130,13 @@ def fetch_items(urls, limit=15):
                     continue
                 seen.add(key)
                 items.append({
-                    "title": title,
-                    "link": entry.get("link", "#"),
-                    "source": _source_from_entry(entry, feed),
-                    "published": entry.get("published", ""),
+                    "title":       title,
+                    "link":        entry.get("link", "#"),
+                    "source":      _source_from_entry(entry, feed),
+                    "published":   entry.get("published", ""),
                     "rss_summary": _rss_summary(entry),
-                    "content": "",
+                    "content":     "",
+                    "lang":        lang,
                 })
                 if len(items) >= limit:
                     return items
@@ -141,7 +168,24 @@ def fetch_sports():
 # ─── Fetch artículo completo ───────────────────────────────────────────────────
 
 def _fetch_article_content(item):
-    """Descarga y extrae el texto del artículo. Fallback al resumen RSS."""
+    """Descarga y extrae el texto. Usa browser headers para evitar bloqueos."""
+    # Intento 1: requests con headers de navegador real
+    try:
+        resp = _req.get(item["link"], headers=_BROWSER_HEADERS, timeout=15, allow_redirects=True)
+        if resp.ok:
+            text = trafilatura.extract(
+                resp.text,
+                include_comments=False,
+                include_tables=False,
+                no_fallback=False,
+            )
+            if text and len(text) > 200:
+                item["content"] = text[:MAX_CONTENT_CHARS]
+                return
+    except Exception as exc:
+        print(f"  ⚠  requests: {item['link'][:60]}… → {exc}", file=sys.stderr)
+
+    # Intento 2: fetcher propio de trafilatura
     try:
         downloaded = trafilatura.fetch_url(item["link"])
         if downloaded:
@@ -157,12 +201,11 @@ def _fetch_article_content(item):
     except Exception as exc:
         print(f"  ⚠  trafilatura: {item['link'][:60]}… → {exc}", file=sys.stderr)
 
-    # Fallback: usar el resumen del RSS
+    # Fallback: resumen del RSS
     item["content"] = item["rss_summary"] or "Contenido no disponible."
 
 
 def enrich_with_content(items):
-    """Lanza fetches en paralelo (máx. 8 hilos)."""
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = {pool.submit(_fetch_article_content, item): item for item in items}
         done = 0
@@ -174,7 +217,40 @@ def enrich_with_content(items):
                 print(f"  ⚠  content worker: {exc}", file=sys.stderr)
             print(f"  → {done}/{len(futures)} artículos procesados", end="\r")
     print()
-    return items
+
+
+# ─── Traducción ───────────────────────────────────────────────────────────────
+
+def _translate(text, source="en", target="es"):
+    if not text or not text.strip():
+        return text
+    try:
+        # Google Translate tiene límite ~4900 chars por petición
+        chunks = [text[i:i + 4800] for i in range(0, len(text), 4800)]
+        parts = []
+        for chunk in chunks:
+            translated = GoogleTranslator(source=source, target=target).translate(chunk)
+            parts.append(translated or chunk)
+            if len(chunks) > 1:
+                time.sleep(0.4)
+        return " ".join(parts)
+    except Exception as exc:
+        print(f"  ⚠  traducción: {exc}", file=sys.stderr)
+        return text
+
+
+def translate_english_items(items):
+    en_items = [item for item in items if item.get("lang") == "en"]
+    if not en_items:
+        return
+    print(f"  🌐 Traduciendo {len(en_items)} artículos del inglés...")
+    for i, item in enumerate(en_items, 1):
+        item["title"] = _translate(item["title"])
+        if item["content"]:
+            item["content"] = _translate(item["content"])
+        print(f"  → {i}/{len(en_items)} traducidos", end="\r")
+        time.sleep(0.5)  # respetar límites de la API gratuita
+    print()
 
 
 # ─── Formateo ─────────────────────────────────────────────────────────────────
@@ -191,7 +267,6 @@ def _fmt_date(s):
 
 
 def _prepare_data(general, tech, sports):
-    """Serializa los artículos como dict keyed por id para el JS."""
     data = {}
     for prefix, items in [("g", general), ("t", tech), ("s", sports)]:
         for i, item in enumerate(items):
@@ -204,6 +279,7 @@ def _prepare_data(general, tech, sports):
                 "sport":   item.get("sport", ""),
                 "color":   item.get("color", ""),
                 "icon":    item.get("icon", ""),
+                "lang":    item.get("lang", "es"),
             }
     return data
 
@@ -356,9 +432,14 @@ CSS = """
   .modal-meta {
     display: flex; gap: 1.2rem; margin-bottom: 1.5rem;
     flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
+    align-items: center;
   }
   .modal-meta span { font-size: .8rem; color: var(--muted); }
   .modal-meta .meta-source { color: #60a5fa; font-weight: 600; }
+  .translated-badge {
+    font-size: .68rem; background: #1e3a5f; border: 1px solid #3b82f6;
+    color: #93c5fd; border-radius: 999px; padding: .15rem .5rem;
+  }
 
   #modal-content { color: var(--body-txt); font-size: .925rem; line-height: 1.8; }
   #modal-content p { margin-bottom: .9rem; }
@@ -404,6 +485,15 @@ function openModal(id) {
   document.getElementById('modal-title').textContent = a.title;
   document.getElementById('modal-source').textContent = a.source;
   document.getElementById('modal-date').textContent   = a.date;
+
+  // Badge de traducción
+  const transBadge = document.getElementById('modal-translated');
+  if (a.lang === 'en') {
+    transBadge.style.display = 'inline';
+    transBadge.textContent = '🌐 Traducido del inglés';
+  } else {
+    transBadge.style.display = 'none';
+  }
 
   // Renderizar párrafos del artículo
   const contentEl = document.getElementById('modal-content');
@@ -465,7 +555,7 @@ def generate_html(general, tech, sports):
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="IANews: noticias del día de actualidad, tecnología y deportes de motor y fútbol europeo."/>
+  <meta name="description" content="IANews: noticias del día de actualidad, tecnología y deportes."/>
   <title>IANews · Noticias del día</title>
   <style>{CSS}</style>
 </head>
@@ -508,6 +598,7 @@ def generate_html(general, tech, sports):
     <div class="modal-meta">
       <span class="meta-source" id="modal-source"></span>
       <span id="modal-date"></span>
+      <span id="modal-translated" class="translated-badge" style="display:none"></span>
     </div>
     <div id="modal-content"></div>
     <div class="modal-footer">
@@ -530,11 +621,11 @@ def generate_html(general, tech, sports):
 
 def main():
     print("📰 Obteniendo noticias generales...")
-    general = fetch_items(GENERAL_FEEDS, limit=10)
+    general = fetch_items(GENERAL_FEEDS, limit=12)
     print(f"   → {len(general)} titulares")
 
     print("💻 Obteniendo noticias de tecnología...")
-    tech = fetch_items(TECH_FEEDS, limit=10)
+    tech = fetch_items(TECH_FEEDS, limit=12)
     print(f"   → {len(tech)} titulares")
 
     print("🏆 Obteniendo noticias de deportes...")
@@ -544,6 +635,9 @@ def main():
     all_items = general + tech + sports
     print(f"\n🔍 Descargando artículos completos ({len(all_items)} en paralelo)...")
     enrich_with_content(all_items)
+
+    print("\n🌐 Traduciendo artículos en inglés...")
+    translate_english_items(general + tech + sports)
 
     html = generate_html(general, tech, sports)
     with open("index.html", "w", encoding="utf-8") as f:
