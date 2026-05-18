@@ -1,0 +1,38 @@
+name: Actualizar noticias
+
+on:
+  schedule:
+    # Cada día a las 7:00 UTC (9:00 hora española en invierno, 9:00 en verano)
+    - cron: "0 7 * * *"
+  workflow_dispatch:   # permite lanzarlo manualmente desde GitHub
+
+permissions:
+  contents: write      # necesario para hacer commit del index.html generado
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install feedparser
+
+      - name: Generar index.html
+        run: python generate_news.py
+
+      - name: Commitear y subir cambios
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          # Solo hace commit si el archivo cambió
+          git diff --staged --quiet || git commit -m "chore: actualizar noticias $(date -u +'%Y-%m-%d')"
+          git push

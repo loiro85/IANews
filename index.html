@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IANews · Configurando...</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a; color: #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0; text-align: center; padding: 2rem;
+    }
+    .box {
+      background: #1e293b; border: 1px solid #334155;
+      border-radius: 16px; padding: 3rem 2.5rem; max-width: 500px;
+    }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    p  { color: #94a3b8; line-height: 1.6; }
+    code {
+      background: #0f172a; border: 1px solid #334155;
+      border-radius: 6px; padding: .15rem .4rem; font-size: .9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>📰 IANews</h1>
+    <p>
+      El sitio está listo. Ve a tu repositorio en GitHub, entra en
+      <strong>Actions → Actualizar noticias</strong> y pulsa
+      <strong>Run workflow</strong> para generar la primera versión.
+    </p>
+    <br/>
+    <p>
+      A partir de entonces se actualizará automáticamente cada día a las
+      <strong>9:00 h (hora España)</strong>.
+    </p>
+    <br/>
+    <p style="font-size:.85rem">
+      También puedes ejecutarlo localmente con:<br/>
+      <code>pip install feedparser &amp;&amp; python generate_news.py</code>
+    </p>
+  </div>
+</body>
+</html>
