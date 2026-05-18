@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar dependencias
-        run: pip install feedparser
+        run: pip install feedparser trafilatura
 
       - name: Generar index.html
         run: python generate_news.py
