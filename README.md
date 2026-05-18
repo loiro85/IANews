@@ -11,34 +11,23 @@ Agregador de noticias diarias para GitHub Pages. Se actualiza automáticamente c
 
 ## Setup (5 pasos)
 
-### 1. Sube los archivos a tu repo
-
-```bash
-git clone https://github.com/TU_USUARIO/TU_REPO.git
-cp -r ~/Documents/Github/news-dashboard/. TU_REPO/
-cd TU_REPO
-git add .
-git commit -m "feat: añadir IANews"
-git push
-```
-
-### 2. Activa GitHub Pages
+### 1. Activa GitHub Pages
 
 En tu repo → **Settings → Pages → Source**: selecciona `Deploy from a branch`, rama `main`, carpeta `/ (root)`.
 
-### 3. Lanza el workflow por primera vez
+### 2. Lanza el workflow por primera vez
 
 **Actions → Actualizar noticias → Run workflow**
 
 Esto genera el `index.html` real con las noticias del día.
 
-### 4. Espera unos segundos y visita tu web
+### 3. Espera unos segundos y visita tu web
 
 ```
-https://TU_USUARIO.github.io/TU_REPO/
+https://loiro85.github.io/IANews/
 ```
 
-### 5. (Opcional) Ejecutar localmente
+### 4. (Opcional) Ejecutar localmente
 
 ```bash
 pip install feedparser
