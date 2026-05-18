@@ -15,6 +15,7 @@
     --border:   #334155;
     --text:     #e2e8f0;
     --muted:    #94a3b8;
+    --body-txt: #cbd5e1;
     --accent-g: #3b82f6;
     --accent-t: #a855f7;
     --accent-s: #f59e0b;
@@ -24,104 +25,132 @@
 
   body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  /* Header */
+  /* ── Header ── */
   header {
     text-align: center;
     padding: 3rem 1rem 2rem;
     background: linear-gradient(180deg, #1e3a5f 0%, var(--bg) 100%);
     border-bottom: 1px solid var(--border);
   }
-  header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.5px; }
+  header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.5px; }
   header .tagline { color: var(--muted); margin-top: .4rem; font-size: .95rem; }
   header .updated {
-    display: inline-block;
-    margin-top: .8rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: .3rem 1rem;
-    font-size: .8rem;
-    color: var(--muted);
+    display: inline-block; margin-top: .8rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: .3rem 1rem;
+    font-size: .8rem; color: var(--muted);
   }
 
-  /* Layout */
+  /* ── Layout ── */
   main { max-width: 1280px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
 
   .section { margin-bottom: 3rem; }
   .section-header {
-    display: flex;
-    align-items: center;
-    gap: .7rem;
-    margin-bottom: 1.2rem;
-    padding-bottom: .7rem;
+    display: flex; align-items: center; gap: .7rem;
+    margin-bottom: 1.2rem; padding-bottom: .7rem;
     border-bottom: 2px solid var(--accent);
   }
   .section-header h2 { font-size: 1.3rem; font-weight: 700; }
+  .section.general { --accent: var(--accent-g); }
+  .section.tech    { --accent: var(--accent-t); }
+  .section.sports  { --accent: var(--accent-s); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
-  .section.general  { --accent: var(--accent-g); }
-  .section.tech     { --accent: var(--accent-t); }
-  .section.sports   { --accent: var(--accent-s); }
+  /* ── Grid ── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
 
-  .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--accent); flex-shrink: 0;
-  }
-
-  /* Grid */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-  }
-
-  /* Card */
+  /* ── Card ── */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.1rem 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: .6rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.1rem 1.2rem;
+    display: flex; flex-direction: column; gap: .6rem;
+    cursor: pointer; user-select: none;
     transition: background .15s, transform .15s, box-shadow .15s;
   }
   .card:hover {
-    background: var(--hover);
-    transform: translateY(-2px);
+    background: var(--hover); transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0,0,0,.4);
   }
-
-  .card h3 { font-size: .92rem; font-weight: 600; line-height: 1.45; flex: 1; }
-  .card h3 a { color: var(--text); text-decoration: none; }
-  .card h3 a:hover { color: var(--accent, #60a5fa); text-decoration: underline; }
-
-  .card footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: .5rem;
-    flex-wrap: wrap;
-  }
+  .card:focus-visible { outline: 2px solid var(--accent-g); outline-offset: 2px; }
+  .card h3 { font-size: .92rem; font-weight: 600; line-height: 1.45; flex: 1; color: var(--text); }
+  .card footer { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
   .src  { font-size: .75rem; color: var(--muted); }
   .date { font-size: .72rem; color: var(--muted); opacity: .8; }
 
   .badge {
-    display: inline-block;
-    font-size: .7rem;
-    font-weight: 700;
-    padding: .2rem .55rem;
-    border-radius: 999px;
-    color: #fff;
-    align-self: flex-start;
+    display: inline-block; font-size: .7rem; font-weight: 700;
+    padding: .2rem .55rem; border-radius: 999px; color: #fff; align-self: flex-start;
   }
 
-  /* Footer */
-  footer.site-footer {
-    text-align: center;
-    padding: 1.5rem 1rem;
-    color: var(--muted);
-    font-size: .8rem;
+  /* ── Modal overlay ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.78);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 2rem 1rem 3rem;
+    overflow-y: auto; z-index: 1000;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  /* ── Modal box ── */
+  .modal-box {
+    background: #1a2843;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    max-width: 740px; width: 100%;
+    padding: 2rem 2.2rem 2rem;
+    position: relative;
+    transform: translateY(24px);
+    transition: transform .22s ease;
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0); }
+
+  .modal-close {
+    position: absolute; top: 1.1rem; right: 1.1rem;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); border-radius: 50%;
+    width: 34px; height: 34px; font-size: 1rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s;
+  }
+  .modal-close:hover { background: var(--border); color: var(--text); }
+
+  .modal-sport-badge { display: inline-block; margin-bottom: .8rem; }
+
+  #modal-title {
+    font-size: 1.25rem; font-weight: 700; line-height: 1.45;
+    padding-right: 2.5rem; margin-bottom: .75rem; color: var(--text);
+  }
+
+  .modal-meta {
+    display: flex; gap: 1.2rem; margin-bottom: 1.5rem;
+    flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
+  }
+  .modal-meta span { font-size: .8rem; color: var(--muted); }
+  .modal-meta .meta-source { color: #60a5fa; font-weight: 600; }
+
+  #modal-content { color: var(--body-txt); font-size: .925rem; line-height: 1.8; }
+  #modal-content p { margin-bottom: .9rem; }
+  #modal-content p:last-child { margin-bottom: 0; }
+
+  .modal-footer {
+    margin-top: 1.75rem; padding-top: 1rem;
     border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end;
+  }
+  .modal-footer a {
+    font-size: .82rem; color: var(--muted); text-decoration: none;
+    padding: .4rem .9rem; border: 1px solid var(--border); border-radius: 8px;
+    transition: color .15s, border-color .15s;
+  }
+  .modal-footer a:hover { color: var(--text); border-color: var(--text); }
+
+  /* ── Site footer ── */
+  footer.site-footer {
+    text-align: center; padding: 1.5rem 1rem;
+    color: var(--muted); font-size: .8rem; border-top: 1px solid var(--border);
   }
   footer.site-footer a { color: var(--muted); }
 </style>
@@ -131,312 +160,406 @@
 <header>
   <h1>📰 IANews</h1>
   <p class="tagline">Noticias del día · Actualidad · Tecnología · Deportes</p>
-  <span class="updated">🕐 18 May 2026 · 13:53 UTC</span>
+  <span class="updated">🕐 18 May 2026 · 14:01 UTC</span>
 </header>
 
 <main>
   <section class="section general">
-    <div class="section-header">
-      <span class="dot"></span>
-      <h2>🌍 Noticias Generales</h2>
-    </div>
+    <div class="section-header"><span class="dot"></span><h2>🌍 Noticias Generales</h2></div>
     <div class="grid">
+    <article class="card" onclick="openModal('g0')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g0')">
       
-    <article class="card">
-      
-      <h3><a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxNRzY1TWt4UG5rbloxdS1Vb1lKaXFUa21BYm9OUlJFRFdCOVdrazBYRGJ3R19hd1NQZUI4MWFhd2lNcmlpUjV6QktUS1I2VTk5MkwwRUZXanpfLXQxdU5pb1NCUjVNbVZOZ3JQc21lcG9nZGRpbEp5UlFkWWhWandxMTRneGE?oc=5" target="_blank" rel="noopener noreferrer">Resultados elecciones Andalucía 2026, en directo | Yolanda Díaz califica de &quot;fracaso mayúsculo&quot; el resultado electoral del PP en Andalucía</a></h3>
+      <h3>Resultados elecciones Andalucía 2026, en directo | Yolanda Díaz califica de &quot;fracaso mayúsculo&quot; el resultado electoral del PP en Andalucía</h3>
       <footer>
         <span class="src">El Mundo</span>
-        <span class="date">18 May 2026 · 12:41</span>
+        <span class="date">18 May 2026 · 12:26</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('g1')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g1')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi1wFBVV95cUxNbHlVWENSQ29aWG1lVDRpUkJ6TGp3eXdFX0RvZ254X2cwVlFTaHlSNG5Md3l1QWJFNVptdU4yYzdEQ19fWFA1ekdWTHJaWlA1bHJYSHdhckVFd18xVERVMDI0d1FicHE3N3BkQWpjM1V5am5pSk52N2pUZ0I5ak5kdkNLQTN3NVh4SGEyLUhLU2d6emhrWTE5eVJ6RnZHdkZyeUJWZDRrcGxONzV3bWZjWHNscEVWNlAzVVRlS0txOUtYU1hyNHVoS3BWcXBhV1piOWYtQ2dXNNIB1wFBVV95cUxPWDlTbXhsTGdaTlZkaEdjcDZnd2JxTHIxZ0hROFhSRFlYWkhuWExuU3pkbXN6RHotNjFTMmlYWHFMeUZYZzhfMjB3NnFLMnpnTWdZZm5ONDgyUkt1MmFQQ2hZekF5bWpuUEdWMFRQXzVabEE3Y3ZTeEc5enNzODdfbnRhSjBuSENUTXVtQmdLNURZcWFCWUl1YlVjclg2V2x2LUVaaGdkN2cyaGJFeWRKRkE3aUl3eE9aUGlSRDA2d25rdGZ0NVdLR1k2OG1oeWdwN1JDRXRwcw?oc=5" target="_blank" rel="noopener noreferrer">Moncloa transmite tranquilidad y descarta un adelanto electoral a pesar de los resultados en Andalucía</a></h3>
+      <h3>Moncloa transmite tranquilidad y descarta un adelanto electoral a pesar de los resultados en Andalucía</h3>
       <footer>
         <span class="src">RTVE.es</span>
         <span class="date">18 May 2026 · 11:41</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('g2')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g2')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxQRUlDU0hiZklzVG15Z2hZc09mOEJpUjllazA5N0lDdG1uY2xSMFdEQ2hDdzJwZlUzTW1LM2cwNEFmLW4wb2tLeW9VUWJCTE1FaGxmcGEySDRCeGpZbzRaV3lqbTZPNTV2RUwtbldGLV9teEN0Z0djcnJGVk5Ddzhnd25qelo3MHJHdDctdjVSaTBCajJpVWRvbFF6aHBNdklzLW1kcm5ZYzJXMWZXWWpmS0FWV3FTYWFILUHSAb8BQVVfeXFMTU1ubkRCdFNSdXRaa28xTkNiYzRiOEpsZVhyUmM1b2FkY2loV3VPRl9FdDc4UHVDY2NyaVV4dHp3NnRkcDhUUE1FOXg0cGJiclk4MXlEQU9SN0tTWWxwOWp5bi0zeWhuWnRvVmt5OW9kN01vT2x1ME1NT2Fld0NxRFF4cWNjcGx2M2t3WGpDOUpkOUFzalJEckd1WHJMNkNDekM4WXR4QUhiTHJwRnNrVk90b2x4N1hJeUV1ejM0bVE?oc=5" target="_blank" rel="noopener noreferrer">Juanma Moreno: «El resultado nos da margen de maniobra para gobernar en solitario en Andalucía»</a></h3>
+      <h3>TASENDE, PRESIDENTE DE VOX MELILLA, CELEBRA EL RESULTADO HISTÓRICO EN ANDALUCÍA YA QUE VOX SE CONSOLIDA COMO FUERZA DECISIVA PARA EL FUTURO GOBIERNO</h3>
+      <footer>
+        <span class="src">VOX España</span>
+        <span class="date">18 May 2026 · 10:08</span>
+      </footer>
+    </article>
+
+    <article class="card" onclick="openModal('g3')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g3')">
+      
+      <h3>Juanma Moreno: «El resultado nos da margen de maniobra para gobernar en solitario en Andalucía»</h3>
       <footer>
         <span class="src">ABC</span>
         <span class="date">18 May 2026 · 10:32</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('g4')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g4')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi3AFBVV95cUxOZUlNNTJDVl9QRlJ1Ump4dHBwVy1MVEhrTFlkM2ItWlo2cVBjTWEySDZPdzc4WjRIbFk5YThjNkptZzFsRGxkRGhZSUdHUVVRbndIRTNSc21BVUtBZVZtMUVoaFU2UmI1Nkl3OVNxWlQxOVVzYVBVZmk5Qk5qZHZBbjhiNmtKVGxBMEZkbDMtYTEwX0Q4NVFndDByUUNJS002ZndTcGV1VmNna0NmZTVZZ0RZUjRQWW1LcTMxT2lZcUhKcF9nZmIyTEV3RGp0WEZhVUtmaGtCT2lGTmRo?oc=5" target="_blank" rel="noopener noreferrer">Elecciones Andalucía: Maíllo toma &quot;buena nota&quot; del resultado</a></h3>
+      <h3>Elecciones Andalucía: Maíllo toma &quot;buena nota&quot; del resultado</h3>
       <footer>
         <span class="src">RTVE.es</span>
         <span class="date">18 May 2026 · 08:12</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('g5')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g5')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxNRzNFd0FJUVlJa2tYMGE4RE1MdERlWUdMNzg1UmJ3SXhsX2JVZlVWQm4wcFBFOV9xVUFBcmc1R19fc3BWdHBGaE9ORG9kSzVqTEh1U2xZUUxvYmNUbVVHeFlSWHBsTTdqM1l6dDlOc0cyZ2NSM0RJV0xYSno4NXkyOTAxSlU0Q1lidXhj?oc=5" target="_blank" rel="noopener noreferrer">La OMS urge a avanzar en la preparación y respuesta frente a pandemias: &quot;El mundo no está más seguro&quot;</a></h3>
+      <h3>La OMS urge a avanzar en la preparación y respuesta frente a pandemias: &quot;El mundo no está más seguro&quot;</h3>
       <footer>
         <span class="src">Gaceta Médica</span>
         <span class="date">18 May 2026 · 12:05</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('g6')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g6')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMivAFBVV95cUxNLVhoWEhlU0REaC1kV1dBejNjS0tmbGpsZzJTU2t2NUQ4RERfcGlSTUtLV09ZdlhQSTR4UVRxVzlaQWtibmxENVFjRW0zQkRJYWV5aE9CaVY2ZUFERnNzZEkyZXJrbURPdjNMamJKZGczMmY2NjNJaVRCMVB5WWtwOTZlN3lsVFdOTkl0VVkzbl9yNTdLNjh3VkJYaUtyYnd6dW9mLUMzdjFGR2lxa1NWZllFUTduV2hqX3NLMA?oc=5" target="_blank" rel="noopener noreferrer">Begoña Gómez pide su absolución ante el juicio y alega que no hay “delito alguno”</a></h3>
-      <footer>
-        <span class="src">EL PAÍS</span>
-        <span class="date">18 May 2026 · 10:05</span>
-      </footer>
-    </article>
-
-    <article class="card">
-      
-      <h3><a href="https://news.google.com/rss/articles/CBMi8gFBVV95cUxNZ2FGUEpiLUx6NkwwVVp2SVJVTE1xcVlNZmNleEFOU3pydnpjOFB6YXcxNk54TWNCXy0zbGJzZVZ0bkJiakZMWjJuc1hkaWNUY0NsTlFUNFNWdDZLdmhCcjBDZlhKREhYcDJYYzJhVTRxVzNpQUhxUktJOUMzdUxrcF9fN3RQOGl2SEt5TGVNYmhTcXVSTGxSRmduV2wzWjlfcWhhY2NVNG96Q2owc3ZjOC0td1BkT3dnNy1xRXRnRG1ZM3dpWTBmd1U1VXNkT05NNGJUS19PSndHVGEzcENFR2ZMcTIzYjNfWDZYMjNoaU1KUdIBhgJBVV95cUxPMW93eG0xYkxmZ2paelBZakFycVZ4czB1MThEQjZmampJbUxrSGdXTkpTOFR0Q21kaHV1ZDdUdVJyWW4zQkxHMk4tRzBTV3E1ZFdDMlZadkZuN1dNamVUYS1JQzJHMTB4VXpXa3JPbW4zUVlZMUdXbWs1a1Q1em04aEM5NVBDcWlwaURjYnMxYWFSai1rQ2lZN3lOVjRaaW1TY1Bka0NVRGlQeXNYM2tTcXlzWTJpVEpsMFI4SEQ3eVVGbnpvbFJ2YzVyekc5ZDA2Um91SWgzVlZkRWloZ1A4eENfeDBfZVBVTVM0dms4Q2JsUWFTY2Z5VElsWmRWa1NzNkRxSFF3?oc=5" target="_blank" rel="noopener noreferrer">La Audiencia Nacional suspende la declaración de la sede de la presidencia de Madrid como Lugar de Memoria Democrática</a></h3>
+      <h3>La Audiencia Nacional suspende la declaración de la sede de la Presidencia de la Comunidad Madrid como lugar de memoria</h3>
       <footer>
         <span class="src">EL PAÍS</span>
         <span class="date">18 May 2026 · 12:26</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('g7')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g7')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi4wFBVV95cUxNYUhuRXJGbjg1dnZJRk84NWxQa2xVQ0FDX1BXZzZGQkVaN05NOUJMNFpXNElleHVoUHQtOS1qc2k2MG9jdmVTTlR3c0ZXRjZJaUdMb01yV0ViaXFjSE51OTNTSUJPQnBSYTJPcjUzb2xDeHFBb0syR0lpd2FacU8tMzN4M21XR2ZjQkt0QVl5XzhNUmozQkVXZjQzM1duUk91QmMwTW94SG1FN05vUDk2ZUhLcDZCLTFRTHRxYkExX0dmT05PejMyd2RKdVpZRElMTFkxLVdjV3ZDOHNvR2lZWXoyVdIB9wFBVV95cUxPMExvNk9mSHNLR3BMZXRjOHhFWFk2Ri12ZHhtTUZuZjNPMXhwcVdCLU1FRVRGYTRrZGgyVDRDYURqS3NzSGtMU3pQYmd4a0Z2dEhGT0lBSnN3LWZiTGU4LUZpb0o5RHExUl9PMXNlWGFpN1BYRWoya1BYN2lKQ1NZSGZ5WHh1aUZMNmpWcE82aG5wbVAxZnpaUXRPQVhtSFhyU1dJa2xBX0JTODdPWDJEbFdzRnV4UEJXRTZ1ZVpDRndabFRVOHRDRHI1YWZlbHRFT1BXRjBtSlR6ZkJ3MXAzYWc4VGdKRVlLZXdkLThHcElEZVNFNUlB?oc=5" target="_blank" rel="noopener noreferrer">Illa y Junqueras escenifican el preacuerdo de los Presupuestos: “Agradezco a ERC su sentido de país”</a></h3>
+      <h3>Realidad aumentada y gráficos sobre monumentos de Sevilla para contar la noche electoral en Andalucía</h3>
+      <footer>
+        <span class="src">RTVE.es</span>
+        <span class="date">18 May 2026 · 11:30</span>
+      </footer>
+    </article>
+
+    <article class="card" onclick="openModal('g8')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g8')">
+      
+      <h3>Illa y Junqueras escenifican el preacuerdo de los Presupuestos: “Agradezco a ERC su sentido de país”</h3>
       <footer>
         <span class="src">EL PAÍS</span>
         <span class="date">18 May 2026 · 11:25</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('g9')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('g9')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi0AFBVV95cUxPRmdoeHg0NGNxdHJxU2ZsMkt6NFZ4QXZRMkl2M3lpdjMzZmxnWFVOYnFoVmpKeTBfMmF5ZE9YcGlrVFdraks1RXgwX2c5U3BjbmdsZUVTR1MyZmZ3cjFCRzNBMk9obTEzQkIyTG9xZDdUaEpRSnFrakpiS0NVUS1RQkVRbDNfQnNnYjBISFFjZHRDaGhlQmFmWFV0dnV4SXRjOUxQMDZHd3JuM0F4RUQxTFc5b1MtMF9rM2ZGd0xmamgyS3dIWFNoQ3lSV01VcEE2?oc=5" target="_blank" rel="noopener noreferrer">Los médicos paran de nuevo esta semana en su cuarta huelga del año por la falta de avances con Sanidad</a></h3>
+      <h3>Los médicos paran de nuevo esta semana en su cuarta huelga del año por la falta de avances con Sanidad</h3>
       <footer>
         <span class="src">20Minutos</span>
         <span class="date">18 May 2026 · 03:00</span>
       </footer>
-    </article>
-
-    <article class="card">
-      
-      <h3><a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQb29JWmNuaUYwTDBlUEpMcDVjaXE5a0kySFFfdzZHRVc3cHlCVVdSRnAtMHhXZTFSbVY1eUJGQU43c2hwYjU5Z29lUVpfSmtPa0VBQmYwUG43OHp0TGdYczBWeU15Z3NYWWRGUXBKODQyN3dkYnQ5NXFpODdVa2ZWUTFqWk1Fd2tQaWFUamtWX0U5VFpz?oc=5" target="_blank" rel="noopener noreferrer">Las ayudas para estudiantes con necesidad de apoyo educativo (NEAE) para el curso 2026-2027 se podrán solicitar a partir del 19 de mayo - Ministerio de Educación, Formación Profesional y Deportes</a></h3>
-      <footer>
-        <span class="src">Ministerio de Educación, Formación Profesional y Deportes</span>
-        <span class="date">18 May 2026 · 08:13</span>
-      </footer>
-    </article>
-    </div>
+    </article></div>
   </section>
 
   <section class="section tech">
-    <div class="section-header">
-      <span class="dot"></span>
-      <h2>💻 Tecnología</h2>
-    </div>
+    <div class="section-header"><span class="dot"></span><h2>💻 Tecnología</h2></div>
     <div class="grid">
+    <article class="card" onclick="openModal('t0')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t0')">
       
-    <article class="card">
-      
-      <h3><a href="https://news.google.com/rss/articles/CBMingJBVV95cUxOYXZPNnRQNnZWX0NWS29jWTVTU0lvWU5QajBEQ21EYklCaFRJcEg4T3BoVjhBS2V3akM4c052OEFKeWthRDBsUDJXN2VOSVJQbkdvTUpDcnhuRXJqZkllWWhMSm5wckR1TmROcnh1OFlyTEhDcElnMVpFZFl0YWhXMW1Cb2ZMM2xDVDRvNU1KWEQyX19uZzVYcnlXbFEzbzVSbGwycFNESERVLU40XzU5QmI4YTlMYUtiOHBSOVJwUjZCUGVOZW9Dc1p1VHM1UGxCT05FRU5kWTlZRHpmOHVNMDRzRV9zcFNrTlBMWjhHQUJfN21qMXVzRzN6aERKS1poQTFsdktGRC1xR010NlV3Nl9Gbmd1THJSOHBHOUFB0gGjAkFVX3lxTE5BSlRScFJneFNjb0hiZWVSMm9JdXpuVC1JTkdFOFpCNHp2MUFDY2d5c0JpalRoeUU3VzdtNTUxbDA2anBiUkU3M3RTRHNkaGMteGlKQzJjZ0RPZkhGb1ZwNnBYN1d2MkEwTzAzdV9yV2lXWHJDaFU1ZFlWXzlQWm5vbjhULUNVNnl4OFR0R0Jhc2pGajdGV011MGhuSHlkRzY1OTNjYjZmcmdhejhibUZONFlSM3haQ0xPX1dCYTBNZzVtNzBKZlVLZ2xyOHVMNGJRbUdJV0dldnlXWk9EV3M0OVItakhoLVBoYVdBZEhMSVF6TGJZMVlZZjR6Tm9aNWlvaVNUYjl1LVNDQmFKbHpOb1c4R0dqN2I5Z0pJT0JJdV9yRQ?oc=5" target="_blank" rel="noopener noreferrer">BBVA señala a Galicia como uno de los territorios con potencial para liderar la innovación en IA</a></h3>
+      <h3>BBVA señala a Galicia como uno de los territorios con potencial para liderar la innovación en IA</h3>
       <footer>
         <span class="src">El Español</span>
         <span class="date">16 May 2026 · 11:30</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t1')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t1')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi6gFBVV95cUxQT1Y2NkJpdERxVGVLckZwc01HazFhMi1GcFVsa1BaUFB0MThEQUZDdHJPTERRS0dYTl9qc1NGbGdjeS1Kby02dWxqQ196emxiT2hnc2s4S0N5RFp6NjhBbzRWYlVTV0M4RlB1VlFQdGRZZFdlN3o0X0dXbVd0akZDOVFHMU1QOWFSNW5BZmFGZ2ZadGRHVkJLb2doQVYxRENtQTlsbExjVVRVc0lxdnUteFNOZ1ZKa0ZHZUpKVHdSM0hWMFJwc016cUQxYXVGTC1maU5LbUY0OUlzX2t6SWZYZnBINVhIN2pqekHSAe8BQVVfeXFMTnRUZE5fcTBJTUZXYUsyVkduZkZGMlNabXhIazV0SE5PempBcll1aFdfbEpkWG9DRkdlY3RQS3loYzRPeTVZempYXzE3aEZXWjNoSk0yRnJ0QkpYNmRmWnpTeUROX3dQdlUzNkhldDdwU0VCYVZHSWdmQTVsd1hIaExyek9abzFaaVBGcVJEZk1TV0JkRTRUNG9Mek12TEREbERoaFQzMnFIdDZ3ZnlIT1BtbEZoWGJGV0RtZkVQbFhCZm4tNzFnTjZqVlFCR0J6RDdqRElZTmhjZHdFWGVJbFRMMW1ob055eldvWFRod2M?oc=5" target="_blank" rel="noopener noreferrer">LaLiga se asocia con la Fundación Cotec para utilizar la Inteligencia Artificial en el fútbol</a></h3>
+      <h3>LaLiga se asocia con la Fundación Cotec para utilizar la Inteligencia Artificial en el fútbol</h3>
       <footer>
         <span class="src">Palco23</span>
         <span class="date">12 May 2026 · 15:24</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t2')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t2')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi8AFBVV95cUxNb3dwX2EydHdqX3JyLTFPb09UMzA1NkNwQUNMUnBicjFwaEpnck4wdUpCQjRnUThjOFo5VG9uUVc5LVJxcXFOSnBvOWs0bkFmeVRCMGlKMV8wNFhyMHNyblMtbGtPMGZwOFBLTDA0bWdfN2psYW8ta2xvMW1sZ0ROX29YejBERzlSaDRybS1PMXgyV19QLTFUU2xTVDBCcWNxVXF3ZTFGaTM0cFFpcVdDdF9vanZlREVpYmlkUjkxQ1Q4MmVBNGhOR3VMQ2VuTkZrNTBLS1owTTJ0LXlBeGdTX09IQnVoenQ3SE15VVVIMGc?oc=5" target="_blank" rel="noopener noreferrer">#Noti90 La innovación y la tecnología siguen llevando el nombre de Cali al escenario internacional. Un docente de la Universidad Autónoma de Occidente participó en importantes encuentros académicos en México sobre robótica e inteligencia artificial, forta</a></h3>
+      <h3>#Noti90 La innovación y la tecnología siguen llevando el nombre de Cali al escenario internacional. Un docente de la Universidad Autónoma de Occidente participó en importantes encuentros académicos en México sobre robótica e inteligencia artificial, forta</h3>
       <footer>
-        <span class="src">Facebook</span>
+        <span class="src">facebook.com</span>
         <span class="date">15 May 2026 · 21:55</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t3')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t3')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi6AFBVV95cUxOaW51N3J5bkp6STVQNHkxMFdMN20xcHhMbnNxejdBZ0RVMGRmZGFDbE5VejFueTRTMWxMdzZjNm5DMDdzTHFpMGJXMjdsRVVqSzdMd1JtX0x6ZjVCbXBUU21sanBReW52aDVfZEdMM0c0eFlpTDczZFlZVmVBZ0RDNnpNbk4yMGhidEhhYl9PYjVlYkVYemkwRW5VNWJiQ1UtYnRvZjRqNENEcFU0a1VvamlNeG1pQmJMOW9vQzlpZ3BGVnFLVTdxdzZndWxjUlE4Zy14elVHNncwTnFuMTZWZTdnQzAwN2hJ?oc=5" target="_blank" rel="noopener noreferrer">Colombia se posiciona como referente regional en inteligencia artificial e innovación digital</a></h3>
+      <h3>Colombia se posiciona como referente regional en inteligencia artificial e innovación digital</h3>
       <footer>
         <span class="src">Vanguardia</span>
         <span class="date">18 May 2026 · 05:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t4')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t4')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMinAFBVV95cUxNRXVjTnhiV1BaZnR6aUhSMWpkY3dqN0tKV3hablZjOWNRTGdJQW44OXhPUG91N29UTXFocDFCUlgzbnVoNGJSeGFSeWJHZDNxM0xMal9vMDJjOFNaM0F3QWx3T3FaZ2pVNTFkTExtY3lfWi1UQVBwcHN4d0JqaGRUTFhDd2kzYjRwVFhqc0NESEYxaW50NjhEdndqQWY?oc=5" target="_blank" rel="noopener noreferrer">The Rolling Stones utiliza inteligencia artificial en su innovador video In The Stars</a></h3>
+      <h3>The Rolling Stones utiliza inteligencia artificial en su innovador video In The Stars</h3>
       <footer>
         <span class="src">Monterrey Rock</span>
         <span class="date">18 May 2026 · 09:53</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t5')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t5')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMif0FVX3lxTFBjXzhCaEd2YUxJSko1b09MTjRIQ0ZEOGpDODBUZ3BRa3R4NmZwRTByRjE2dzJxVWJTTG95OUFZc2JVbm5Fd3hIRy1KYnl0X09pcWRtY2s3SnpUeTRaaHpWWFpJam9DWTkza0lkY3JtdU9ub3ZIVnNnWVNzSUVqNEk?oc=5" target="_blank" rel="noopener noreferrer">La historia de la inteligencia artificial (IA)</a></h3>
-      <footer>
-        <span class="src">BBVA</span>
-        <span class="date">27 Apr 2026 · 07:00</span>
-      </footer>
-    </article>
-
-    <article class="card">
-      
-      <h3><a href="https://news.google.com/rss/articles/CBMi7AFBVV95cUxQTVNmOW5XX3RfRk1BZU1Rb1hkWEx4U2VWeENPSEhyTFpxYU0yaGZxdWFqWF9Ga2RUY296YXQ4MXpuVEtwdjJKT1c0SFYwVVN0V1FrY2toLU5DdnRTcjNhS1Z5ODNKMy1Xc1c0ZjRqT2RVVFpzNzFKdDRucjRRTEM2OWZiZ2RNZDZOd0xGMXkxV1hlX296QkxMYlNOdERBUTlrYVdpSlZ4bXlzeHRrUGQwZ0UtVXRYWl83Z2ZJSHNZMDZBcUVyMEEyMkdSdUMtanVDVGRvRmg5TFlMcXJJTE16OFY3MlBYNDNqZ3RwaQ?oc=5" target="_blank" rel="noopener noreferrer">Niño: “Madrid acerca la inteligencia artificial y la tecnología a las personas mayores con el Programa APPtitud”</a></h3>
+      <h3>Niño: “Madrid acerca la inteligencia artificial y la tecnología a las personas mayores con el Programa APPtitud”</h3>
       <footer>
         <span class="src">Diario del Ayuntamiento de Madrid</span>
         <span class="date">07 Apr 2026 · 07:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t6')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t6')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi4wFBVV95cUxOQXpXNmtOVG1VbEIzZnRLcVEzSF9nWWIwRGQ1UnBGckxfV1NIUmQ5cTF1c2RmeUY2dlhJY0l4QkRRc1VxbWFmdHVEOUhSUXFONUtwMUI2UHlQeGVObGxkMjZESXg5TlYxODJhTEx0dXpTYmdnaDBLOURkLWhqbGRXcWZoX2FjSk9XdUZIdmFrUDhjSS1wQkIxdVk2RUdoV21yVzFnZ0hfQWJXdXFtaWQ1cVE3WnprZmhQRF9pcjhXUkF6THM4bldJX1pwbV83Xy00RzNhU0pnd0h6eTZpbTdfMGdWaw?oc=5" target="_blank" rel="noopener noreferrer">La FIFA lo confirma: Estas son todas las innovaciones con IA que veremos en el Mundial 2026</a></h3>
+      <h3>La FIFA lo confirma: Estas son todas las innovaciones con IA que veremos en el Mundial 2026</h3>
       <footer>
         <span class="src">National Geographic España</span>
         <span class="date">25 Apr 2026 · 07:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t7')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t7')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi1AFBVV95cUxPTHFMZ1lfbWJnZUU1eEVCbnNyTTRJQWRBRVBlMTZSMTdfNEVKSTZFTTlhdzNrUk41MDRiOFFvbE9oZzZjNVlBZjBISWlhRmU5WExPMlNoYXF3NkNOQ3cyQnYxaFZqNm1sVTNKengxQl9mNjJyeWJBQWlzVWl4bGFxdURaUWljbk5vMHRBQS15ZnRhbTRpOTJQWkZaWG02c3JJY1BWdzFuU2Q1eFFkUWZXdkJ5RnkyWHA4dGRleThWM0JaYmNIQTI4WTllcGk3N085cWVBaA?oc=5" target="_blank" rel="noopener noreferrer">Barranquilla vivirá el futuro con IA+, la primera feria inmersiva de inteligencia artificial, innovación y tecnología</a></h3>
+      <h3>Barranquilla vivirá el futuro con IA+, la primera feria inmersiva de inteligencia artificial, innovación y tecnología</h3>
       <footer>
         <span class="src">impactonews.co</span>
         <span class="date">12 May 2026 · 20:23</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('t8')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t8')">
       
-      <h3><a href="https://news.google.com/rss/articles/CBMi6gFBVV95cUxNRTRYdDgxYUI0RTMtcjJyd0R6cUI4OUN6VWJMMUJkbkVSUnczR0cyX2QwTFdTUjVnNy1LbTY1eTlYeFJBVUMwcHlwQ3JhM0F1eDFaZnlZYUlRSU5LNlVqT2ZhN2djSEQwWnRpdWRIWTFvTDhvNlFOT2IyWmtpS0Y3N0RMbzJJY1hEdWQ3SUZjS3JXZ01SS0czOXVRSHAyNUtYN0tKT0lNVExRbldYQ3B2SUdKSnJZSFdGR2wtN3MtTWwwcV9PX2U4MW52SFJsb0JRMzJnY1B6TFZxaVdjVHBld2c3RVZNX0ZSeEE?oc=5" target="_blank" rel="noopener noreferrer">La inteligencia artificial centra una nueva edición de “Innovación con propósito” en el Grado en Marketing de la UFV</a></h3>
+      <h3>Creatividad e inteligencia artificial: cómo la tecnología está ampliando la toma de decisiones en el Perú</h3>
       <footer>
-        <span class="src">UFV</span>
-        <span class="date">11 Mar 2026 · 07:00</span>
+        <span class="src">Infobae</span>
+        <span class="date">08 May 2026 · 07:00</span>
       </footer>
     </article>
-    </div>
+
+    <article class="card" onclick="openModal('t9')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('t9')">
+      
+      <h3>Avon renueva imagen y acelera innovación con inteligencia artificial</h3>
+      <footer>
+        <span class="src">expansion.mx</span>
+        <span class="date">15 May 2026 · 02:43</span>
+      </footer>
+    </article></div>
   </section>
 
   <section class="section sports">
-    <div class="section-header">
-      <span class="dot"></span>
-      <h2>🏆 Deportes</h2>
-    </div>
+    <div class="section-header"><span class="dot"></span><h2>🏆 Deportes</h2></div>
     <div class="grid">
-      
-    <article class="card">
+    <article class="card" onclick="openModal('s0')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s0')">
       <span class="badge" style="background:#E10600">🏎️ Formula 1</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxQRmhNSVZzQ0paaGtBN0dRWTJYNDd2SndOYTZEVTRXbDVWYk55RnliYXRCd3lVVURrTEhSQU1kanloM243ZWJmSGR6dWVRSEE3RXNFdm1fOHFzUS02QVhxV0RhSVpLS0p2ejFEMlhLQ0FKRlRFS3N2a0NBcHMybnphOEhOUmJwVFU3d0w0ZzdmVlB3T213cTZqakFOWUdOX3UyYnJsXzljelR3S2pxQkJ0V2VhblZBWUJUZ3RR0gG7AUFVX3lxTE53MDdyeGJFdTB0UUsxOW9UaThIdDB6dWFteTVhZnB4N1dINEZ0OEZVUTFDOFMzUXlTcDk1UHpxTXFkdUxPeDdPRzBXLUc1NUJXZjhNOWhGR3NlTFNkTDV6UGN6MWh2MXU5YWtybzFjOEd3UThmSTg0NFlrTWhtSjJkQzBiWHBxRlVMbzlYQ2trcTdwWWp6bnpFalRWbUFySkdaa21GVzhrYTdRVXRXU3VZdHg3R0NHVi1Da28?oc=5" target="_blank" rel="noopener noreferrer">GP de Canadá de F1: fechas, horarios y dónde ver en TV la carrera de Alonso y Sainz</a></h3>
+      <h3>GP de Canadá de F1: fechas, horarios y dónde ver en TV la carrera de Alonso y Sainz</h3>
       <footer>
         <span class="src">MARCA</span>
         <span class="date">18 May 2026 · 06:29</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s1')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s1')">
       <span class="badge" style="background:#E10600">🏎️ Formula 1</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxOa0FDSDV6NWNoQmtGbnowZnotOEE5dEEtZFE5M1piVC1oZ1FUcmJ3S29FUEw0MFhudXo2WDRPd2UxQmVuWDRCNVhnVmhQek1QVGJwWXF0N2lkdDN2WjZQNTdrTU81T1NSdERtNDM3WWpIMWtPUHloZFV4cDVaaGd2VVZYanZPSVE?oc=5" target="_blank" rel="noopener noreferrer">Horarios del GP de Canadá de F1 2026 y cómo verlo: tarde y al sprint</a></h3>
+      <h3>Horarios del GP de Canadá de F1 2026 y cómo verlo: tarde y al sprint</h3>
       <footer>
         <span class="src">Motorsport.com España</span>
         <span class="date">17 May 2026 · 22:13</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s2')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s2')">
       <span class="badge" style="background:#E10600">🏎️ Formula 1</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxPYWhveTNPTnNlRXJibUhQcldzSjBNVTdKYTZnV1M5LWp1aDFxRmhvclNBdEhqUElKQ1BZUVlCbUVkOTZ2X2lBMWtOQWF0NXNadlp2NnR5d1ZJb0V5VjJrenBGTUFPaUJmUHZqdTM2NVIxa1lNNlRsNGtBWlhhMHFMNHJ0NTRqNkhUQlRxRkI3aFZIbHYybnR2dE9SZzZtZUkwT0g2VkMyeUpnOGFv?oc=5" target="_blank" rel="noopener noreferrer">Calendario del Gran Premio de Canadá de Fórmula 1 de 2026</a></h3>
+      <h3>Calendario del Gran Premio de Canadá de Fórmula 1 de 2026</h3>
       <footer>
         <span class="src">AutoHebdo</span>
         <span class="date">18 May 2026 · 08:55</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s3')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s3')">
       <span class="badge" style="background:#FF6B00">🏍️ MotoGP</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMipwFBVV95cUxQNUJGRUNHVEtJODI4VG9TREh6Ry1ZQXBGY01BMGVNNEc4a1g5Ylk3WEFkYXV0LXVqUmMwZlN6d1p6Q0ZjYlBpTHZYakFxZkZOeGp2bERGemVqSHdkM3BKT0xxdGVpRGZ4eThIM2dyc0pnemRtUzNfN2dWc1R0NjNyUzRUUjJQU2hXaktKVkR0MnlLYXlIWER2SENDbzE0NHRVSXEwMlhjdw?oc=5" target="_blank" rel="noopener noreferrer">MotoGP Catalunya en Montmeló, hoy: resultado y última hora de Jorge Martín y Álex Márquez, en directo</a></h3>
+      <h3>MotoGP Catalunya en Montmeló, hoy: resultado y última hora de Jorge Martín y Álex Márquez, en directo</h3>
       <footer>
         <span class="src">El Confidencial</span>
         <span class="date">17 May 2026 · 16:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s4')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s4')">
       <span class="badge" style="background:#FF6B00">🏍️ MotoGP</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPSVJYVVc3dzB2Ni1Cc3pmTnZOSHFlWmNPU2k3TGhEUy1vV3Z1ZDFTWFVFbnBaT0ZzNThvQy1LOHRYNFdfQmoxUkZzSTRrTmtsQWpCU3hCU3JScTF1N1BqN0tQM0ZGekRxOVJDZDk3Wmw5MnRuQ1BwRWpOQV83NTVzTGp3ZnVNdGlrMWdMX1BqS1lWZVM1VjZwcG1zeXlIR3pNQ3YydThvUGtPZw?oc=5" target="_blank" rel="noopener noreferrer">Una durísima caída de Álex Márquez marca un accidentado Gran Premio de Cataluña de MotoGP</a></h3>
+      <h3>Una durísima caída de Álex Márquez marca un accidentado Gran Premio de Cataluña de MotoGP</h3>
       <footer>
         <span class="src">RTVE.es</span>
         <span class="date">17 May 2026 · 11:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s5')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s5')">
       <span class="badge" style="background:#00B4D8">⚡ Formula E</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMiygFBVV95cUxNenFWM1hGc0VXUVNQUHB2X1AyVFFnVlJyTWJPaGdmTUZxY25pMnNzZWNqakVWbGhTX2ZKNHBaWDFzWGg0NC1ENGZfN0paSlE2WmU4eDdKa2hLUmxHSTBNMk1qUDdvMnBDR05jVkgzenhZMkhzN1AwVU15RTZmZ3hlZnptbnVLWmVJdUtaeXVRcWI5WkItU1RaOG9NeTdySmVCNmY5SG1fTlpDY0xBWUxaVDl2UFNBdjhTN3Z6QzRhRnF3a21KZjI0d0tn?oc=5" target="_blank" rel="noopener noreferrer">ABB FIA Fórmula E: tecnología que habilita el futuro de las sociedades de bajas emisiones</a></h3>
+      <h3>ABB FIA Fórmula E: tecnología que habilita el futuro de las sociedades de bajas emisiones</h3>
       <footer>
         <span class="src">ABB</span>
         <span class="date">09 Jan 2026 · 08:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s6')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s6')">
       <span class="badge" style="background:#00B4D8">⚡ Formula E</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNaldQeEJoaUMxeXU1Y3Q5ckxWd0dpVEdhN3BKVnVjQzVDRm0zcEtKb2JfQUN3bmdlclB2bm92Mll4TWJqYXh2dGFnMWxtUklBZENsUEc2cWw3S1VMeTFYTnZob2p5Wk8tX2g2b2xVV2ZUcmVqS3p4MGpQdTdZQ3R1TjJQenNCXzRwd1lYR0phaERRbW1BWlpaTjFveVd1V2htanc?oc=5" target="_blank" rel="noopener noreferrer">ABB ‘enchufa’ la Fórmula E en Madrid</a></h3>
+      <h3>ABB ‘enchufa’ la Fórmula E en Madrid</h3>
       <footer>
         <span class="src">Automática e Instrumentación</span>
         <span class="date">24 Mar 2026 · 07:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s7')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s7')">
       <span class="badge" style="background:#16A34A">⚽ Fútbol</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMi2wFBVV95cUxQVVZrRDlJbnhjNUhVSVZyTmZuWklBVDFBRDR5NTRESGtiOVdSdld5OENjUmptU05ORW1MWnFYVi1ZZ0ZDWXF3cWpoTVRLMVppS0pSQUxkQUR1U1ZmNHpnUzZtSVBFSkFyTHZZb3JnZzZMVkkzTmd3YkNrbXYxd2FyalZvSHVBakNKSW9vWGRxMjJ2X1ZJMjNyUnNfNXRjanV0YWpQZERFZzNhUHRxdVVzNmVBQzFoSHc1bVBteERSTTJTRlhMUXZZcHBJNlkwN3Y5MHNUMlVsVV9NNGM?oc=5" target="_blank" rel="noopener noreferrer">Máximos goleadores de las ligas europeas: Kane, Haaland, Mbappé...</a></h3>
+      <h3>Máximos goleadores de las ligas europeas: Kane, Haaland, Mbappé...</h3>
       <footer>
         <span class="src">UEFA.com</span>
         <span class="date">18 May 2026 · 05:23</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s8')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s8')">
       <span class="badge" style="background:#16A34A">⚽ Fútbol</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMiigJBVV95cUxPOXVDZHJsQWhwQWg0aUliUFNZcWdtbklhRC1PQ0NhR19DWTVPRFA1d3JZRXQ1YlBJNVhoMHV4bmdrVldvMWExY3A5dnNKc0RmZHMwV1NuU3BDLV8wWFdLSTdpaFl1SUVfQXo1Unk3TlkzUlVsUUFZc0s2QTE3aFI3Z1NoN0tjNUdobm9MY1RLSHlBa2RTaFU1OUgzdm1qSEV6cDhZb1pYMFBXejhLN1NTTmdGc3pFNnUyWmk3bzF1X3lCNmk4eTlha1ZuZ3MtcnZqM29BODRsNndvaFZCeWF3RVB3Z3lray03cnhTQU94bTZubUlHQ3hxNVlZTVhZcmlGMmJ6blA3SHJoZ9IBngJBVV95cUxONFdkYmtWOWJqS0dYbHgyV2oySUNYNnRjai1WclBJX3RWZjhGVHRUbER0NXA3MkNyRDVGZG9vcm5NRXFtY21KSjZTUlc2WU9tLS03TlRwQUFpNVdCdWxXdkp6ckUzdTJ0UXhwOTRIRFFoVHQ2YUpDUVZ6VklCUDZjc2RSNUlIOUFYY0V4YWFQa1RRc3g1cDJvTXBuWXhCWnRiemZFRVljV29TSGVrYldORlBEMFhaaXBHa0RjcXdXNFNFcjhDbGNrU0x1azJkLUVCd0kyWU0wNWRfZ0t5bHZfaG5ONDQ3NWd0RUdsNXU0RTRNNk02RlIwdkZaTFdrNExGSGwyd25aTUNsMm9qN0FxcmxpOVVHc2Y1LURRMkVB?oc=5" target="_blank" rel="noopener noreferrer">Real Madrid, Barcelona y Atlético, a la conquista de la Premier: City, Newcastle y Tottenham, los rivales en octavos de la Champions</a></h3>
+      <h3>Real Madrid, Barcelona y Atlético, a la conquista de la Premier: City, Newcastle y Tottenham, los rivales en octavos de la Champions</h3>
       <footer>
         <span class="src">EL PAÍS</span>
         <span class="date">28 Feb 2026 · 08:00</span>
       </footer>
     </article>
 
-    <article class="card">
+    <article class="card" onclick="openModal('s9')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')openModal('s9')">
       <span class="badge" style="background:#16A34A">⚽ Fútbol</span>
-      <h3><a href="https://news.google.com/rss/articles/CBMitwFBVV95cUxNZm0ycW9fUE9oU1V4TVpCcEZ6anY4VkZvNjhfWmJpODBDb2c0NGpXa1Fid19tcGhnWVJhdnRvYjVhalhTMnBFTTEwYVpMZ1hWazFMYzJIWklFczVDa0ZIYnFqUm9XSVVfT1dYaFltemwtUHh6VF9tMm1zTjJmWGRYOVAzNTVrUTFrXzlSWHVJMHZvTk44aWxleUYyclVlN1Q5ZUp0UlVTREhkQzdnMVJaNjdSZ0poNlXSAbwBQVVfeXFMUFlCRnRRRmdfaGIta0RRcXRlX2FUZ0RySjNMaU9IOW1kZDAtUDBqbEFHN0ZVMFBnaXZGd2w3YkxoS2tQQTJYT2FEeHF4SUh4TWpBNWhkYkhRTXNtZXZDWmhfSWFHWks4Yk5aZS1FejQzRDZxYWZLVjAxRGpiUWRPZXJ3SWlUcjdFc25KQjl3bFJOWDF0SVdVeTRmbWpiWEZlY05GU285aWZMX042OG54TWhxeGNpcmlaaGpoRjQ?oc=5" target="_blank" rel="noopener noreferrer">Cómo está la quinta plaza de Champions para los equipo españoles</a></h3>
+      <h3>Cómo está la quinta plaza de Champions para los equipo españoles</h3>
       <footer>
         <span class="src">Superdeporte</span>
         <span class="date">26 Feb 2026 · 08:00</span>
       </footer>
-    </article>
-    </div>
+    </article></div>
   </section>
 </main>
 
 <footer class="site-footer">
   Actualizado automáticamente cada día con GitHub Actions ·
-  <a href="https://github.com" target="_blank" rel="noopener">Ver repositorio</a>
+  <a href="https://github.com/loiro85/IANews" target="_blank" rel="noopener">Ver repositorio</a>
 </footer>
+
+<!-- ── Modal ─────────────────────────────────────────── -->
+<div id="modal" class="modal-overlay" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button id="modal-close-btn" class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
+    <span id="modal-sport-badge"></span>
+    <h2 id="modal-title"></h2>
+    <div class="modal-meta">
+      <span class="meta-source" id="modal-source"></span>
+      <span id="modal-date"></span>
+    </div>
+    <div id="modal-content"></div>
+    <div class="modal-footer">
+      <a id="modal-link" href="#" target="_blank" rel="noopener noreferrer">
+        Abrir artículo original ↗
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Datos embebidos ─────────────────────────────────── -->
+<script type="application/json" id="iadata">{"g0": {"title": "Resultados elecciones Andalucía 2026, en directo | Yolanda Díaz califica de \"fracaso mayúsculo\" el resultado electoral del PP en Andalucía", "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNRzY1TWt4UG5rbloxdS1Vb1lKaXFUa21BYm9OUlJFRFdCOVdrazBYRGJ3R19hd1NQZUI4MWFhd2lNcmlpUjV6QktUS1I2VTk5MkwwRUZXanpfLXQxdU5pb1NCUjVNbVZOZ3JQc21lcG9nZGRpbEp5UlFkWWhWandxMTRneGE?oc=5", "source": "El Mundo", "date": "18 May 2026 · 12:26", "content": "Resultados elecciones Andalucía 2026, en directo | Yolanda Díaz califica de \"fracaso mayúsculo\" el resultado electoral del PP en Andalucía    El Mundo    Moreno: “El resultado nos da margen de maniobra para poder gobernar en solitario”    EL PAÍS    Moreno pierde la absoluta, Feijóo gana las elecciones    El Confidencial    Aciertos y fallos de las encuestas: esto decían sobre la mayoría absoluta de Moreno y el sorpaso en la izquierda    elDiario.es    Moreno intentará un gobierno en solitario con el aval de Feijóo y del resto de barones del PP    El Correo", "sport": "", "color": "", "icon": ""}, "g1": {"title": "Moncloa transmite tranquilidad y descarta un adelanto electoral a pesar de los resultados en Andalucía", "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNbHlVWENSQ29aWG1lVDRpUkJ6TGp3eXdFX0RvZ254X2cwVlFTaHlSNG5Md3l1QWJFNVptdU4yYzdEQ19fWFA1ekdWTHJaWlA1bHJYSHdhckVFd18xVERVMDI0d1FicHE3N3BkQWpjM1V5am5pSk52N2pUZ0I5ak5kdkNLQTN3NVh4SGEyLUhLU2d6emhrWTE5eVJ6RnZHdkZyeUJWZDRrcGxONzV3bWZjWHNscEVWNlAzVVRlS0txOUtYU1hyNHVoS3BWcXBhV1piOWYtQ2dXNNIB1wFBVV95cUxPWDlTbXhsTGdaTlZkaEdjcDZnd2JxTHIxZ0hROFhSRFlYWkhuWExuU3pkbXN6RHotNjFTMmlYWHFMeUZYZzhfMjB3NnFLMnpnTWdZZm5ONDgyUkt1MmFQQ2hZekF5bWpuUEdWMFRQXzVabEE3Y3ZTeEc5enNzODdfbnRhSjBuSENUTXVtQmdLNURZcWFCWUl1YlVjclg2V2x2LUVaaGdkN2cyaGJFeWRKRkE3aUl3eE9aUGlSRDA2d25rdGZ0NVdLR1k2OG1oeWdwN1JDRXRwcw?oc=5", "source": "RTVE.es", "date": "18 May 2026 · 11:41", "content": "Moncloa transmite tranquilidad y descarta un adelanto electoral a pesar de los resultados en Andalucía    RTVE.es    El hundimiento del PSOE con Sánchez: pierde peso en 4 elecciones en 5 meses, quema a sus mejores candidatas y arrastra a la izquierda fiel    El Mundo    El PSOE asegura que la pregunta ahora es \"quién va a gobernar en Andalucía\": \"No existe ninguna posibilidad de que nos abstengamos\"    El Periódico    Ferraz respalda a Montero, pero endosa la autocrítica por la debacle a Andalucía    ABC    Fin del ciclo sanchista    Expansión", "sport": "", "color": "", "icon": ""}, "g2": {"title": "TASENDE, PRESIDENTE DE VOX MELILLA, CELEBRA EL RESULTADO HISTÓRICO EN ANDALUCÍA YA QUE VOX SE CONSOLIDA COMO FUERZA DECISIVA PARA EL FUTURO GOBIERNO", "link": "https://news.google.com/rss/articles/CBMimwJBVV95cUxOWTVwUG5KV1huU2daZ1lVeExRYmhvME43bHhIMzZ2WGMxajFzeEszTnJ2ck5EdHROWGdiOVpxZGRvZ0ttMm51NTdPRVVnQzVra3QwMXlBcGFPUXFoZ0ZfTW9qSzl4cHRlU0RYT3IyQVJYcnR3Q3dfTVdJcEo4emVacE1KbHhjbHZXX29GaFhDcXVjMWZ5dkY4RC1teDNWajdZLTJNSzRoRlZhYzB2V28zcGQ5aWV2WmlJamJ5VHZyTFFHNFpJVV9NUnotSFdyeFY1cFlrVzFEcE1zNHI4aENMZGk5WS1iUVhNQXZaMThRU2tRMzNSR0Y3WnJzQ19oSTdGLWhaWjFKQy1RcThBY1Y0WGZmbVZ5WGZtUm5j0gGgAkFVX3lxTFBOMnNReDVvSENJVnFHbnlzTWJzdmlkNkF2ZmZOUWo0U1dTVThpdW02bnRmU0dpR0J6QjdicjR3Y1hVNHI3VXMyYTM2ZVdRcnBlRmhoa3lpLXlfQWV1QUttR1RaTkM3SHZXeWNMRzVaTzNqVVlfSWhQeUg5Nk05TnlZejlZN2M5TEVnZzljLUJ0bDB4YjFCTTA3Snh3b2l4enNFc2FmWWhHbFdlRTBsWkhsbGxpd2taSURvNk94NHRrZTM4ZTQ3aWNaVnRtcWotTHI2UFIzeURxelpHQm40dkhwb1ZzenpmUHVpNnRLR0JzazY5OGZKQ240ZjdhN2JWaThpelZWSTZzZ3NOaXh2Nm01VVoxanA3Mng2SUZReHFnVw?oc=5", "source": "VOX España", "date": "18 May 2026 · 10:08", "content": "TASENDE, PRESIDENTE DE VOX MELILLA, CELEBRA EL RESULTADO HISTÓRICO EN ANDALUCÍA YA QUE VOX SE CONSOLIDA COMO FUERZA DECISIVA PARA EL FUTURO GOBIERNO    VOX España    Gavira insiste en que Vox no quiere sillones sino la prioridad de los andaluces    ABC    Vox recalca su \"prioridad nacional\" y que el PP tendrá que escucharles para gobernar en Andalucía    El Mundo    La prioridad nacional sanitaria vuelve a escena para negociar en Andalucía    Redacción Médica    Vox agita la “prioridad nacional” para pactar con Moreno y dice que negociará “consciente de la proporcionalidad”    elDiario.es", "sport": "", "color": "", "icon": ""}, "g3": {"title": "Juanma Moreno: «El resultado nos da margen de maniobra para gobernar en solitario en Andalucía»", "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQRUlDU0hiZklzVG15Z2hZc09mOEJpUjllazA5N0lDdG1uY2xSMFdEQ2hDdzJwZlUzTW1LM2cwNEFmLW4wb2tLeW9VUWJCTE1FaGxmcGEySDRCeGpZbzRaV3lqbTZPNTV2RUwtbldGLV9teEN0Z0djcnJGVk5Ddzhnd25qelo3MHJHdDctdjVSaTBCajJpVWRvbFF6aHBNdklzLW1kcm5ZYzJXMWZXWWpmS0FWV3FTYWFILUHSAb8BQVVfeXFMTU1ubkRCdFNSdXRaa28xTkNiYzRiOEpsZVhyUmM1b2FkY2loV3VPRl9FdDc4UHVDY2NyaVV4dHp3NnRkcDhUUE1FOXg0cGJiclk4MXlEQU9SN0tTWWxwOWp5bi0zeWhuWnRvVmt5OW9kN01vT2x1ME1NT2Fld0NxRFF4cWNjcGx2M2t3WGpDOUpkOUFzalJEckd1WHJMNkNDekM4WXR4QUhiTHJwRnNrVk90b2x4N1hJeUV1ejM0bVE?oc=5", "source": "ABC", "date": "18 May 2026 · 10:32", "content": "Juanma Moreno: «El resultado nos da margen de maniobra para gobernar en solitario en Andalucía»    ABC   Ver más titulares y perspectivas en Google News", "sport": "", "color": "", "icon": ""}, "g4": {"title": "Elecciones Andalucía: Maíllo toma \"buena nota\" del resultado", "link": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxOZUlNNTJDVl9QRlJ1Ump4dHBwVy1MVEhrTFlkM2ItWlo2cVBjTWEySDZPdzc4WjRIbFk5YThjNkptZzFsRGxkRGhZSUdHUVVRbndIRTNSc21BVUtBZVZtMUVoaFU2UmI1Nkl3OVNxWlQxOVVzYVBVZmk5Qk5qZHZBbjhiNmtKVGxBMEZkbDMtYTEwX0Q4NVFndDByUUNJS002ZndTcGV1VmNna0NmZTVZZ0RZUjRQWW1LcTMxT2lZcUhKcF9nZmIyTEV3RGp0WEZhVUtmaGtCT2lGTmRo?oc=5", "source": "RTVE.es", "date": "18 May 2026 · 08:12", "content": "Elecciones Andalucía: Maíllo toma \"buena nota\" del resultado    RTVE.es    La candidatura de IU, Sumar y Podemos se tropieza en las urnas andaluzas    EL PAÍS    IU reconoce que su presencia en el Gobierno ha condicionado el resultado de Por Andalucía    El Correo    Por Andalucía mantiene sus cinco escaños pero pierde el liderazgo de la izquierda alternativa    Diario Público    Por Andalucía salva los muebles tras el regreso de Maíllo pero no evita el 'sorpaso' de Adelante    ABC", "sport": "", "color": "", "icon": ""}, "g5": {"title": "La OMS urge a avanzar en la preparación y respuesta frente a pandemias: \"El mundo no está más seguro\"", "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNRzNFd0FJUVlJa2tYMGE4RE1MdERlWUdMNzg1UmJ3SXhsX2JVZlVWQm4wcFBFOV9xVUFBcmc1R19fc3BWdHBGaE9ORG9kSzVqTEh1U2xZUUxvYmNUbVVHeFlSWHBsTTdqM1l6dDlOc0cyZ2NSM0RJV0xYSno4NXkyOTAxSlU0Q1lidXhj?oc=5", "source": "Gaceta Médica", "date": "18 May 2026 · 12:05", "content": "La OMS urge a avanzar en la preparación y respuesta frente a pandemias: \"El mundo no está más seguro\"    Gaceta Médica    La OMS alerta de que la humanidad está al borde de sufrir una pandemia aún más dañina: “El mundo no es más seguro”    EL PAÍS    «El mundo está al borde» de una pandemia peor que la del covid, advierte la OMS    El Correo    Los brotes infecciosos aumentan en frecuencia y gravedad, según un informe    Sinc    La OMS alerta de que el planeta podría estar al borde de una nueva pandemia más dañina: \"El mundo está cada    LaSexta", "sport": "", "color": "", "icon": ""}, "g6": {"title": "La Audiencia Nacional suspende la declaración de la sede de la Presidencia de la Comunidad Madrid como lugar de memoria", "link": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNZ2FGUEpiLUx6NkwwVVp2SVJVTE1xcVlNZmNleEFOU3pydnpjOFB6YXcxNk54TWNCXy0zbGJzZVZ0bkJiakZMWjJuc1hkaWNUY0NsTlFUNFNWdDZLdmhCcjBDZlhKREhYcDJYYzJhVTRxVzNpQUhxUktJOUMzdUxrcF9fN3RQOGl2SEt5TGVNYmhTcXVSTGxSRmduV2wzWjlfcWhhY2NVNG96Q2owc3ZjOC0td1BkT3dnNy1xRXRnRG1ZM3dpWTBmd1U1VXNkT05NNGJUS19PSndHVGEzcENFR2ZMcTIzYjNfWDZYMjNoaU1KUdIBhgJBVV95cUxPMW93eG0xYkxmZ2paelBZakFycVZ4czB1MThEQjZmampJbUxrSGdXTkpTOFR0Q21kaHV1ZDdUdVJyWW4zQkxHMk4tRzBTV3E1ZFdDMlZadkZuN1dNamVUYS1JQzJHMTB4VXpXa3JPbW4zUVlZMUdXbWs1a1Q1em04aEM5NVBDcWlwaURjYnMxYWFSai1rQ2lZN3lOVjRaaW1TY1Bka0NVRGlQeXNYM2tTcXlzWTJpVEpsMFI4SEQ3eVVGbnpvbFJ2YzVyekc5ZDA2Um91SWgzVlZkRWloZ1A4eENfeDBfZVBVTVM0dms4Q2JsUWFTY2Z5VElsWmRWa1NzNkRxSFF3?oc=5", "source": "EL PAÍS", "date": "18 May 2026 · 12:26", "content": "La Audiencia Nacional suspende la declaración de la sede de la Presidencia de la Comunidad Madrid como lugar de memoria    EL PAÍS    La Audiencia Nacional da la razón a Ayuso y suspende la declaración de la Real Casa de Correos como lugar de Memoria Democrática    Cadena SER    La Justicia suspende la declaración como lugar de memoria de la sede de la Puerta del Sol que albergó torturas franquistas    elDiario.es    La Audiencia Nacional cautelarmente el nombramiento de lugar de memoria democrática a la sede de la Comunidad de Madrid    La Vanguardia    La Audiencia Nacional suspende de forma cautelar la declaración de la Real Casa de Correos como Lugar de Memoria Democrática    El Mundo", "sport": "", "color": "", "icon": ""}, "g7": {"title": "Realidad aumentada y gráficos sobre monumentos de Sevilla para contar la noche electoral en Andalucía", "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPNXQxVDN4T09XVnpOX0FwQ29GeTVnbEZQZDZxUmxWeE5EVTFqaEIzYW5XdE9ETmh1OVlzdDVPOHV6N0lNZDE3VUFveFhCbk1WWHlPQWRfLVhEa0hHYUg2dUZYRHJNUkczMVZVUWl1NjJFU2w4RXIxZnRkOWdUT2RfZXhBTXhlcEdSN2V1cW05MHgtM0xuVzgzSEFMVWMzUV9BQld1US1keDZJenlPckpFZ1JoVkJVc0J30gG4AUFVX3lxTE5GYlMzSV9HZzRET3FQaVNpV21CYzhyNVNJNkJJQ3ZLbFdiaWwzdWo2UTROTTZDaUw4R2lJWEhyVnRESzdhTS1kWmk2WHRSOGJDSWphLVFQdzNVdDJlUms5cXNjZkFXOW1LVXdWS2VySzl1azVyLXlvM1FmbEJvbEtSMjlLR1FjQUVodC16dG1DS0N6OXp0bHlERjNkWDJKRVJqYmtnQkJtZnk3OWRyVHFlVnlsUDFUYzE?oc=5", "source": "RTVE.es", "date": "18 May 2026 · 11:30", "content": "Realidad aumentada y gráficos sobre monumentos de Sevilla para contar la noche electoral en Andalucía    RTVE.es    Elecciones 17 M Autonómicas, Noche Electoral...    CanalSur Más    Cambio de programación en Antena 3 por las elecciones andaluzas: desplaza 'Una nueva vida' y prioriza 'Antena 3 noticias'    El Confidencial    Carlos Alsina se pone al frente del programa especial Elecciones Andalucía 2026    Onda Cero    Dónde seguir las elecciones de Andalucía en televisión: resultados y escrutinio en directo en estas cadenas    El Periódico", "sport": "", "color": "", "icon": ""}, "g8": {"title": "Illa y Junqueras escenifican el preacuerdo de los Presupuestos: “Agradezco a ERC su sentido de país”", "link": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxNYUhuRXJGbjg1dnZJRk84NWxQa2xVQ0FDX1BXZzZGQkVaN05NOUJMNFpXNElleHVoUHQtOS1qc2k2MG9jdmVTTlR3c0ZXRjZJaUdMb01yV0ViaXFjSE51OTNTSUJPQnBSYTJPcjUzb2xDeHFBb0syR0lpd2FacU8tMzN4M21XR2ZjQkt0QVl5XzhNUmozQkVXZjQzM1duUk91QmMwTW94SG1FN05vUDk2ZUhLcDZCLTFRTHRxYkExX0dmT05PejMyd2RKdVpZRElMTFkxLVdjV3ZDOHNvR2lZWXoyVdIB9wFBVV95cUxPMExvNk9mSHNLR3BMZXRjOHhFWFk2Ri12ZHhtTUZuZjNPMXhwcVdCLU1FRVRGYTRrZGgyVDRDYURqS3NzSGtMU3pQYmd4a0Z2dEhGT0lBSnN3LWZiTGU4LUZpb0o5RHExUl9PMXNlWGFpN1BYRWoya1BYN2lKQ1NZSGZ5WHh1aUZMNmpWcE82aG5wbVAxZnpaUXRPQVhtSFhyU1dJa2xBX0JTODdPWDJEbFdzRnV4UEJXRTZ1ZVpDRndabFRVOHRDRHI1YWZlbHRFT1BXRjBtSlR6ZkJ3MXAzYWc4VGdKRVlLZXdkLThHcElEZVNFNUlB?oc=5", "source": "EL PAÍS", "date": "18 May 2026 · 11:25", "content": "Illa y Junqueras escenifican el preacuerdo de los Presupuestos: “Agradezco a ERC su sentido de país”    EL PAÍS    Govern y ERC escenifican el acuerdo de presupuestos en la presentación de la línea orbital ferroviaria    El Periódico    Illa y Junqueras exhiben la línea orbital como paso previo a la aprobación de los presupuestos    La Vanguardia    Lo que ERC arranca a Illa: reforzar la Hacienda catalana, el control del CZF e inversión estatal    Expansión    Govern, ERC y Comuns afrontan una semana decisiva para sellar los presupuestos en Catalunya    elDiario.es", "sport": "", "color": "", "icon": ""}, "g9": {"title": "Los médicos paran de nuevo esta semana en su cuarta huelga del año por la falta de avances con Sanidad", "link": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPRmdoeHg0NGNxdHJxU2ZsMkt6NFZ4QXZRMkl2M3lpdjMzZmxnWFVOYnFoVmpKeTBfMmF5ZE9YcGlrVFdraks1RXgwX2c5U3BjbmdsZUVTR1MyZmZ3cjFCRzNBMk9obTEzQkIyTG9xZDdUaEpRSnFrakpiS0NVUS1RQkVRbDNfQnNnYjBISFFjZHRDaGhlQmFmWFV0dnV4SXRjOUxQMDZHd3JuM0F4RUQxTFc5b1MtMF9rM2ZGd0xmamgyS3dIWFNoQ3lSV01VcEE2?oc=5", "source": "20Minutos", "date": "18 May 2026 · 03:00", "content": "Los médicos paran de nuevo esta semana en su cuarta huelga del año por la falta de avances con Sanidad    20Minutos    Huelga de médicos en España: horarios y fechas de las manifestaciones en Madrid, Cataluña, Andalucía, País Vasco, Comunidad Valenciana y Castilla y León    El Confidencial    La ministra de Sanidad ve «incentivos» a sindicatos médicos para que mantengan la huelga, que este lunes empezó su cuarto paro semanal    La Voz de Galicia    Informativo Huesca 13:35- 18/05/26    RTVE.es    La discreta negociación del Estatuto Marco para ganar apoyos nacionalistas    Redacción Médica", "sport": "", "color": "", "icon": ""}, "t0": {"title": "BBVA señala a Galicia como uno de los territorios con potencial para liderar la innovación en IA", "link": "https://news.google.com/rss/articles/CBMingJBVV95cUxOYXZPNnRQNnZWX0NWS29jWTVTU0lvWU5QajBEQ21EYklCaFRJcEg4T3BoVjhBS2V3akM4c052OEFKeWthRDBsUDJXN2VOSVJQbkdvTUpDcnhuRXJqZkllWWhMSm5wckR1TmROcnh1OFlyTEhDcElnMVpFZFl0YWhXMW1Cb2ZMM2xDVDRvNU1KWEQyX19uZzVYcnlXbFEzbzVSbGwycFNESERVLU40XzU5QmI4YTlMYUtiOHBSOVJwUjZCUGVOZW9Dc1p1VHM1UGxCT05FRU5kWTlZRHpmOHVNMDRzRV9zcFNrTlBMWjhHQUJfN21qMXVzRzN6aERKS1poQTFsdktGRC1xR010NlV3Nl9Gbmd1THJSOHBHOUFB0gGjAkFVX3lxTE5BSlRScFJneFNjb0hiZWVSMm9JdXpuVC1JTkdFOFpCNHp2MUFDY2d5c0JpalRoeUU3VzdtNTUxbDA2anBiUkU3M3RTRHNkaGMteGlKQzJjZ0RPZkhGb1ZwNnBYN1d2MkEwTzAzdV9yV2lXWHJDaFU1ZFlWXzlQWm5vbjhULUNVNnl4OFR0R0Jhc2pGajdGV011MGhuSHlkRzY1OTNjYjZmcmdhejhibUZONFlSM3haQ0xPX1dCYTBNZzVtNzBKZlVLZ2xyOHVMNGJRbUdJV0dldnlXWk9EV3M0OVItakhoLVBoYVdBZEhMSVF6TGJZMVlZZjR6Tm9aNWlvaVNUYjl1LVNDQmFKbHpOb1c4R0dqN2I5Z0pJT0JJdV9yRQ?oc=5", "source": "El Español", "date": "16 May 2026 · 11:30", "content": "BBVA señala a Galicia como uno de los territorios con potencial para liderar la innovación en IA    El Español", "sport": "", "color": "", "icon": ""}, "t1": {"title": "LaLiga se asocia con la Fundación Cotec para utilizar la Inteligencia Artificial en el fútbol", "link": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxQT1Y2NkJpdERxVGVLckZwc01HazFhMi1GcFVsa1BaUFB0MThEQUZDdHJPTERRS0dYTl9qc1NGbGdjeS1Kby02dWxqQ196emxiT2hnc2s4S0N5RFp6NjhBbzRWYlVTV0M4RlB1VlFQdGRZZFdlN3o0X0dXbVd0akZDOVFHMU1QOWFSNW5BZmFGZ2ZadGRHVkJLb2doQVYxRENtQTlsbExjVVRVc0lxdnUteFNOZ1ZKa0ZHZUpKVHdSM0hWMFJwc016cUQxYXVGTC1maU5LbUY0OUlzX2t6SWZYZnBINVhIN2pqekHSAe8BQVVfeXFMTnRUZE5fcTBJTUZXYUsyVkduZkZGMlNabXhIazV0SE5PempBcll1aFdfbEpkWG9DRkdlY3RQS3loYzRPeTVZempYXzE3aEZXWjNoSk0yRnJ0QkpYNmRmWnpTeUROX3dQdlUzNkhldDdwU0VCYVZHSWdmQTVsd1hIaExyek9abzFaaVBGcVJEZk1TV0JkRTRUNG9Mek12TEREbERoaFQzMnFIdDZ3ZnlIT1BtbEZoWGJGV0RtZkVQbFhCZm4tNzFnTjZqVlFCR0J6RDdqRElZTmhjZHdFWGVJbFRMMW1ob055eldvWFRod2M?oc=5", "source": "Palco23", "date": "12 May 2026 · 15:24", "content": "LaLiga se asocia con la Fundación Cotec para utilizar la Inteligencia Artificial en el fútbol    Palco23", "sport": "", "color": "", "icon": ""}, "t2": {"title": "#Noti90 La innovación y la tecnología siguen llevando el nombre de Cali al escenario internacional. Un docente de la Universidad Autónoma de Occidente participó en importantes encuentros académicos en México sobre robótica e inteligencia artificial, forta", "link": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxNb3dwX2EydHdqX3JyLTFPb09UMzA1NkNwQUNMUnBicjFwaEpnck4wdUpCQjRnUThjOFo5VG9uUVc5LVJxcXFOSnBvOWs0bkFmeVRCMGlKMV8wNFhyMHNyblMtbGtPMGZwOFBLTDA0bWdfN2psYW8ta2xvMW1sZ0ROX29YejBERzlSaDRybS1PMXgyV19QLTFUU2xTVDBCcWNxVXF3ZTFGaTM0cFFpcVdDdF9vanZlREVpYmlkUjkxQ1Q4MmVBNGhOR3VMQ2VuTkZrNTBLS1owTTJ0LXlBeGdTX09IQnVoenQ3SE15VVVIMGc?oc=5", "source": "facebook.com", "date": "15 May 2026 · 21:55", "content": "#Noti90 La innovación y la tecnología siguen llevando el nombre de Cali al escenario internacional. Un docente de la Universidad Autónoma de Occidente participó en importantes encuentros académicos en México sobre robótica e inteligencia artificial, forta    facebook.com", "sport": "", "color": "", "icon": ""}, "t3": {"title": "Colombia se posiciona como referente regional en inteligencia artificial e innovación digital", "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOaW51N3J5bkp6STVQNHkxMFdMN20xcHhMbnNxejdBZ0RVMGRmZGFDbE5VejFueTRTMWxMdzZjNm5DMDdzTHFpMGJXMjdsRVVqSzdMd1JtX0x6ZjVCbXBUU21sanBReW52aDVfZEdMM0c0eFlpTDczZFlZVmVBZ0RDNnpNbk4yMGhidEhhYl9PYjVlYkVYemkwRW5VNWJiQ1UtYnRvZjRqNENEcFU0a1VvamlNeG1pQmJMOW9vQzlpZ3BGVnFLVTdxdzZndWxjUlE4Zy14elVHNncwTnFuMTZWZTdnQzAwN2hJ?oc=5", "source": "Vanguardia", "date": "18 May 2026 · 05:00", "content": "Colombia se posiciona como referente regional en inteligencia artificial e innovación digital    Vanguardia", "sport": "", "color": "", "icon": ""}, "t4": {"title": "The Rolling Stones utiliza inteligencia artificial en su innovador video In The Stars", "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRXVjTnhiV1BaZnR6aUhSMWpkY3dqN0tKV3hablZjOWNRTGdJQW44OXhPUG91N29UTXFocDFCUlgzbnVoNGJSeGFSeWJHZDNxM0xMal9vMDJjOFNaM0F3QWx3T3FaZ2pVNTFkTExtY3lfWi1UQVBwcHN4d0JqaGRUTFhDd2kzYjRwVFhqc0NESEYxaW50NjhEdndqQWY?oc=5", "source": "Monterrey Rock", "date": "18 May 2026 · 09:53", "content": "The Rolling Stones utiliza inteligencia artificial en su innovador video In The Stars    Monterrey Rock", "sport": "", "color": "", "icon": ""}, "t5": {"title": "Niño: “Madrid acerca la inteligencia artificial y la tecnología a las personas mayores con el Programa APPtitud”", "link": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxQTVNmOW5XX3RfRk1BZU1Rb1hkWEx4U2VWeENPSEhyTFpxYU0yaGZxdWFqWF9Ga2RUY296YXQ4MXpuVEtwdjJKT1c0SFYwVVN0V1FrY2toLU5DdnRTcjNhS1Z5ODNKMy1Xc1c0ZjRqT2RVVFpzNzFKdDRucjRRTEM2OWZiZ2RNZDZOd0xGMXkxV1hlX296QkxMYlNOdERBUTlrYVdpSlZ4bXlzeHRrUGQwZ0UtVXRYWl83Z2ZJSHNZMDZBcUVyMEEyMkdSdUMtanVDVGRvRmg5TFlMcXJJTE16OFY3MlBYNDNqZ3RwaQ?oc=5", "source": "Diario del Ayuntamiento de Madrid", "date": "07 Apr 2026 · 07:00", "content": "Niño: “Madrid acerca la inteligencia artificial y la tecnología a las personas mayores con el Programa APPtitud”    Diario del Ayuntamiento de Madrid", "sport": "", "color": "", "icon": ""}, "t6": {"title": "La FIFA lo confirma: Estas son todas las innovaciones con IA que veremos en el Mundial 2026", "link": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxOQXpXNmtOVG1VbEIzZnRLcVEzSF9nWWIwRGQ1UnBGckxfV1NIUmQ5cTF1c2RmeUY2dlhJY0l4QkRRc1VxbWFmdHVEOUhSUXFONUtwMUI2UHlQeGVObGxkMjZESXg5TlYxODJhTEx0dXpTYmdnaDBLOURkLWhqbGRXcWZoX2FjSk9XdUZIdmFrUDhjSS1wQkIxdVk2RUdoV21yVzFnZ0hfQWJXdXFtaWQ1cVE3WnprZmhQRF9pcjhXUkF6THM4bldJX1pwbV83Xy00RzNhU0pnd0h6eTZpbTdfMGdWaw?oc=5", "source": "National Geographic España", "date": "25 Apr 2026 · 07:00", "content": "La FIFA lo confirma: Estas son todas las innovaciones con IA que veremos en el Mundial 2026    National Geographic España", "sport": "", "color": "", "icon": ""}, "t7": {"title": "Barranquilla vivirá el futuro con IA+, la primera feria inmersiva de inteligencia artificial, innovación y tecnología", "link": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPTHFMZ1lfbWJnZUU1eEVCbnNyTTRJQWRBRVBlMTZSMTdfNEVKSTZFTTlhdzNrUk41MDRiOFFvbE9oZzZjNVlBZjBISWlhRmU5WExPMlNoYXF3NkNOQ3cyQnYxaFZqNm1sVTNKengxQl9mNjJyeWJBQWlzVWl4bGFxdURaUWljbk5vMHRBQS15ZnRhbTRpOTJQWkZaWG02c3JJY1BWdzFuU2Q1eFFkUWZXdkJ5RnkyWHA4dGRleThWM0JaYmNIQTI4WTllcGk3N085cWVBaA?oc=5", "source": "impactonews.co", "date": "12 May 2026 · 20:23", "content": "Barranquilla vivirá el futuro con IA+, la primera feria inmersiva de inteligencia artificial, innovación y tecnología    impactonews.co", "sport": "", "color": "", "icon": ""}, "t8": {"title": "Creatividad e inteligencia artificial: cómo la tecnología está ampliando la toma de decisiones en el Perú", "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxORWs5LV81SWN6SUR3WG1kMGdZMzNTNWVrUjBuLWlja0lwUXI5a0VNVk1aLTJlU1cwSWtZQ2JwR1FIR2F5dkJXN1B6Qi1HWTB5S1NHb2I4UmYwOGpQWG1GbWo2MGM0S3JNNDFtNzV2UmN6S2UzWVdQYVA1dlV1UU9iNnlTSUlqN1I2TUtkeGZ0c1Fwb2ttX1NEdzA3bzFCS05lZ2dlRGVMMGNuS3hzTHFhUUNZTHNTc0tmNXZZdVFfUWNKcTQ3Q2dRbEFoVldRVWpoY3FtcnRKZ0NkcktEZVHSAfgBQVVfeXFMUE1Vd2pNYmdoaU9yZlIxTlZxajFfWkJMSWliZjNCbWNKUEQ5T01QYkUyWEpqZkY3NXJERFBNMTZReXRUYVY1aFNZYkpwcUg0am02OEdRUmVLZUk1Um9OMUdsUzNIQXhWX2R2Q2NlcUpLdXZKb0JzUV9vaGVNT01FMnd1eVkzc19abUI3UXVhZXVxOG1CTi1lbzZWSXpLejdfZFVQMXhmcDVzVHBxU2ZnYWxidi12UE5mWEZQR3Zyd2x2SzNlZkgxT1BpTEJVZUpsRklFb0RSanp1aG5YN2lNb1kzR2JrMzNLclpNLUdfd0dTQTdCbVc1VWI?oc=5", "source": "Infobae", "date": "08 May 2026 · 07:00", "content": "Creatividad e inteligencia artificial: cómo la tecnología está ampliando la toma de decisiones en el Perú    Infobae", "sport": "", "color": "", "icon": ""}, "t9": {"title": "Avon renueva imagen y acelera innovación con inteligencia artificial", "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9WLUFYM2xfR21KVDRsUlpTZlVnaW9WRS1MMEZxbUVJdTV5TlFIS1FhOUxLbXE2Ui1BVGFzY1VQQ05qV1JkWDZzVE01dUk3dzNjWE8zdHB5aGVRakU4QmpCaEV0aVNtWllsVmhlRGoxVndSYldVbGk5cUpTWDVGbUXSAYwBQVVfeXFMUFFZR1NJenRsMXZrTzMycW1ZeG1Fek13NHpNNjlyWkhYZkEtY3BLdDVLQ2ZzTzU1emxyRkd5TjVxcXFWRThVTFJiZXFyeW5nYy1ZQTNvcVNtLWh2eXh1dkZuSnY4cGFKc1pzdXdHcXBoN1A1S202dy0yZWYwejRHRWRIYzdKX2pDdGxJdGo?oc=5", "source": "expansion.mx", "date": "15 May 2026 · 02:43", "content": "Avon renueva imagen y acelera innovación con inteligencia artificial    expansion.mx", "sport": "", "color": "", "icon": ""}, "s0": {"title": "GP de Canadá de F1: fechas, horarios y dónde ver en TV la carrera de Alonso y Sainz", "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQRmhNSVZzQ0paaGtBN0dRWTJYNDd2SndOYTZEVTRXbDVWYk55RnliYXRCd3lVVURrTEhSQU1kanloM243ZWJmSGR6dWVRSEE3RXNFdm1fOHFzUS02QVhxV0RhSVpLS0p2ejFEMlhLQ0FKRlRFS3N2a0NBcHMybnphOEhOUmJwVFU3d0w0ZzdmVlB3T213cTZqakFOWUdOX3UyYnJsXzljelR3S2pxQkJ0V2VhblZBWUJUZ3RR0gG7AUFVX3lxTE53MDdyeGJFdTB0UUsxOW9UaThIdDB6dWFteTVhZnB4N1dINEZ0OEZVUTFDOFMzUXlTcDk1UHpxTXFkdUxPeDdPRzBXLUc1NUJXZjhNOWhGR3NlTFNkTDV6UGN6MWh2MXU5YWtybzFjOEd3UThmSTg0NFlrTWhtSjJkQzBiWHBxRlVMbzlYQ2trcTdwWWp6bnpFalRWbUFySkdaa21GVzhrYTdRVXRXU3VZdHg3R0NHVi1Da28?oc=5", "source": "MARCA", "date": "18 May 2026 · 06:29", "content": "GP de Canadá de F1: fechas, horarios y dónde ver en TV la carrera de Alonso y Sainz    MARCA", "sport": "Formula 1", "color": "#E10600", "icon": "🏎️"}, "s1": {"title": "Horarios del GP de Canadá de F1 2026 y cómo verlo: tarde y al sprint", "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOa0FDSDV6NWNoQmtGbnowZnotOEE5dEEtZFE5M1piVC1oZ1FUcmJ3S29FUEw0MFhudXo2WDRPd2UxQmVuWDRCNVhnVmhQek1QVGJwWXF0N2lkdDN2WjZQNTdrTU81T1NSdERtNDM3WWpIMWtPUHloZFV4cDVaaGd2VVZYanZPSVE?oc=5", "source": "Motorsport.com España", "date": "17 May 2026 · 22:13", "content": "Horarios del GP de Canadá de F1 2026 y cómo verlo: tarde y al sprint    Motorsport.com España", "sport": "Formula 1", "color": "#E10600", "icon": "🏎️"}, "s2": {"title": "Calendario del Gran Premio de Canadá de Fórmula 1 de 2026", "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPYWhveTNPTnNlRXJibUhQcldzSjBNVTdKYTZnV1M5LWp1aDFxRmhvclNBdEhqUElKQ1BZUVlCbUVkOTZ2X2lBMWtOQWF0NXNadlp2NnR5d1ZJb0V5VjJrenBGTUFPaUJmUHZqdTM2NVIxa1lNNlRsNGtBWlhhMHFMNHJ0NTRqNkhUQlRxRkI3aFZIbHYybnR2dE9SZzZtZUkwT0g2VkMyeUpnOGFv?oc=5", "source": "AutoHebdo", "date": "18 May 2026 · 08:55", "content": "Calendario del Gran Premio de Canadá de Fórmula 1 de 2026    AutoHebdo", "sport": "Formula 1", "color": "#E10600", "icon": "🏎️"}, "s3": {"title": "MotoGP Catalunya en Montmeló, hoy: resultado y última hora de Jorge Martín y Álex Márquez, en directo", "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQNUJGRUNHVEtJODI4VG9TREh6Ry1ZQXBGY01BMGVNNEc4a1g5Ylk3WEFkYXV0LXVqUmMwZlN6d1p6Q0ZjYlBpTHZYakFxZkZOeGp2bERGemVqSHdkM3BKT0xxdGVpRGZ4eThIM2dyc0pnemRtUzNfN2dWc1R0NjNyUzRUUjJQU2hXaktKVkR0MnlLYXlIWER2SENDbzE0NHRVSXEwMlhjdw?oc=5", "source": "El Confidencial", "date": "17 May 2026 · 16:00", "content": "MotoGP Catalunya en Montmeló, hoy: resultado y última hora de Jorge Martín y Álex Márquez, en directo    El Confidencial", "sport": "MotoGP", "color": "#FF6B00", "icon": "🏍️"}, "s4": {"title": "Una durísima caída de Álex Márquez marca un accidentado Gran Premio de Cataluña de MotoGP", "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPSVJYVVc3dzB2Ni1Cc3pmTnZOSHFlWmNPU2k3TGhEUy1vV3Z1ZDFTWFVFbnBaT0ZzNThvQy1LOHRYNFdfQmoxUkZzSTRrTmtsQWpCU3hCU3JScTF1N1BqN0tQM0ZGekRxOVJDZDk3Wmw5MnRuQ1BwRWpOQV83NTVzTGp3ZnVNdGlrMWdMX1BqS1lWZVM1VjZwcG1zeXlIR3pNQ3YydThvUGtPZw?oc=5", "source": "RTVE.es", "date": "17 May 2026 · 11:00", "content": "Una durísima caída de Álex Márquez marca un accidentado Gran Premio de Cataluña de MotoGP    RTVE.es", "sport": "MotoGP", "color": "#FF6B00", "icon": "🏍️"}, "s5": {"title": "ABB FIA Fórmula E: tecnología que habilita el futuro de las sociedades de bajas emisiones", "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNenFWM1hGc0VXUVNQUHB2X1AyVFFnVlJyTWJPaGdmTUZxY25pMnNzZWNqakVWbGhTX2ZKNHBaWDFzWGg0NC1ENGZfN0paSlE2WmU4eDdKa2hLUmxHSTBNMk1qUDdvMnBDR05jVkgzenhZMkhzN1AwVU15RTZmZ3hlZnptbnVLWmVJdUtaeXVRcWI5WkItU1RaOG9NeTdySmVCNmY5SG1fTlpDY0xBWUxaVDl2UFNBdjhTN3Z6QzRhRnF3a21KZjI0d0tn?oc=5", "source": "ABB", "date": "09 Jan 2026 · 08:00", "content": "ABB FIA Fórmula E: tecnología que habilita el futuro de las sociedades de bajas emisiones    ABB", "sport": "Formula E", "color": "#00B4D8", "icon": "⚡"}, "s6": {"title": "ABB ‘enchufa’ la Fórmula E en Madrid", "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNaldQeEJoaUMxeXU1Y3Q5ckxWd0dpVEdhN3BKVnVjQzVDRm0zcEtKb2JfQUN3bmdlclB2bm92Mll4TWJqYXh2dGFnMWxtUklBZENsUEc2cWw3S1VMeTFYTnZob2p5Wk8tX2g2b2xVV2ZUcmVqS3p4MGpQdTdZQ3R1TjJQenNCXzRwd1lYR0phaERRbW1BWlpaTjFveVd1V2htanc?oc=5", "source": "Automática e Instrumentación", "date": "24 Mar 2026 · 07:00", "content": "ABB ‘enchufa’ la Fórmula E en Madrid    Automática e Instrumentación", "sport": "Formula E", "color": "#00B4D8", "icon": "⚡"}, "s7": {"title": "Máximos goleadores de las ligas europeas: Kane, Haaland, Mbappé...", "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxQVVZrRDlJbnhjNUhVSVZyTmZuWklBVDFBRDR5NTRESGtiOVdSdld5OENjUmptU05ORW1MWnFYVi1ZZ0ZDWXF3cWpoTVRLMVppS0pSQUxkQUR1U1ZmNHpnUzZtSVBFSkFyTHZZb3JnZzZMVkkzTmd3YkNrbXYxd2FyalZvSHVBakNKSW9vWGRxMjJ2X1ZJMjNyUnNfNXRjanV0YWpQZERFZzNhUHRxdVVzNmVBQzFoSHc1bVBteERSTTJTRlhMUXZZcHBJNlkwN3Y5MHNUMlVsVV9NNGM?oc=5", "source": "UEFA.com", "date": "18 May 2026 · 05:23", "content": "Máximos goleadores de las ligas europeas: Kane, Haaland, Mbappé...    UEFA.com", "sport": "Fútbol", "color": "#16A34A", "icon": "⚽"}, "s8": {"title": "Real Madrid, Barcelona y Atlético, a la conquista de la Premier: City, Newcastle y Tottenham, los rivales en octavos de la Champions", "link": "https://news.google.com/rss/articles/CBMiigJBVV95cUxPOXVDZHJsQWhwQWg0aUliUFNZcWdtbklhRC1PQ0NhR19DWTVPRFA1d3JZRXQ1YlBJNVhoMHV4bmdrVldvMWExY3A5dnNKc0RmZHMwV1NuU3BDLV8wWFdLSTdpaFl1SUVfQXo1Unk3TlkzUlVsUUFZc0s2QTE3aFI3Z1NoN0tjNUdobm9MY1RLSHlBa2RTaFU1OUgzdm1qSEV6cDhZb1pYMFBXejhLN1NTTmdGc3pFNnUyWmk3bzF1X3lCNmk4eTlha1ZuZ3MtcnZqM29BODRsNndvaFZCeWF3RVB3Z3lray03cnhTQU94bTZubUlHQ3hxNVlZTVhZcmlGMmJ6blA3SHJoZ9IBngJBVV95cUxONFdkYmtWOWJqS0dYbHgyV2oySUNYNnRjai1WclBJX3RWZjhGVHRUbER0NXA3MkNyRDVGZG9vcm5NRXFtY21KSjZTUlc2WU9tLS03TlRwQUFpNVdCdWxXdkp6ckUzdTJ0UXhwOTRIRFFoVHQ2YUpDUVZ6VklCUDZjc2RSNUlIOUFYY0V4YWFQa1RRc3g1cDJvTXBuWXhCWnRiemZFRVljV29TSGVrYldORlBEMFhaaXBHa0RjcXdXNFNFcjhDbGNrU0x1azJkLUVCd0kyWU0wNWRfZ0t5bHZfaG5ONDQ3NWd0RUdsNXU0RTRNNk02RlIwdkZaTFdrNExGSGwyd25aTUNsMm9qN0FxcmxpOVVHc2Y1LURRMkVB?oc=5", "source": "EL PAÍS", "date": "28 Feb 2026 · 08:00", "content": "Real Madrid, Barcelona y Atlético, a la conquista de la Premier: City, Newcastle y Tottenham, los rivales en octavos de la Champions    EL PAÍS", "sport": "Fútbol", "color": "#16A34A", "icon": "⚽"}, "s9": {"title": "Cómo está la quinta plaza de Champions para los equipo españoles", "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNZm0ycW9fUE9oU1V4TVpCcEZ6anY4VkZvNjhfWmJpODBDb2c0NGpXa1Fid19tcGhnWVJhdnRvYjVhalhTMnBFTTEwYVpMZ1hWazFMYzJIWklFczVDa0ZIYnFqUm9XSVVfT1dYaFltemwtUHh6VF9tMm1zTjJmWGRYOVAzNTVrUTFrXzlSWHVJMHZvTk44aWxleUYyclVlN1Q5ZUp0UlVTREhkQzdnMVJaNjdSZ0poNlXSAbwBQVVfeXFMUFlCRnRRRmdfaGIta0RRcXRlX2FUZ0RySjNMaU9IOW1kZDAtUDBqbEFHN0ZVMFBnaXZGd2w3YkxoS2tQQTJYT2FEeHF4SUh4TWpBNWhkYkhRTXNtZXZDWmhfSWFHWks4Yk5aZS1FejQzRDZxYWZLVjAxRGpiUWRPZXJ3SWlUcjdFc25KQjl3bFJOWDF0SVdVeTRmbWpiWEZlY05GU285aWZMX042OG54TWhxeGNpcmlaaGpoRjQ?oc=5", "source": "Superdeporte", "date": "26 Feb 2026 · 08:00", "content": "Cómo está la quinta plaza de Champions para los equipo españoles    Superdeporte", "sport": "Fútbol", "color": "#16A34A", "icon": "⚽"}}</script>
+<script>
+const DATA = JSON.parse(document.getElementById('iadata').textContent);
+
+function openModal(id) {
+  const a = DATA[id];
+  if (!a) return;
+
+  // Badge deportivo
+  const badgeEl = document.getElementById('modal-sport-badge');
+  if (a.sport) {
+    badgeEl.textContent = a.icon + ' ' + a.sport;
+    badgeEl.style.cssText = 'background:' + a.color + ';display:inline-block;font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;color:#fff;margin-bottom:.8rem;';
+  } else {
+    badgeEl.style.display = 'none';
+    badgeEl.textContent = '';
+  }
+
+  document.getElementById('modal-title').textContent = a.title;
+  document.getElementById('modal-source').textContent = a.source;
+  document.getElementById('modal-date').textContent   = a.date;
+
+  // Renderizar párrafos del artículo
+  const contentEl = document.getElementById('modal-content');
+  contentEl.innerHTML = '';
+  (a.content || 'Contenido no disponible.')
+    .split(/\n+/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0)
+    .forEach(p => {
+      const el = document.createElement('p');
+      el.textContent = p;
+      contentEl.appendChild(el);
+    });
+
+  document.getElementById('modal-link').href = a.link;
+
+  const overlay = document.getElementById('modal');
+  overlay.classList.add('open');
+  overlay.removeAttribute('hidden');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('modal-close-btn').focus();
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modal');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(() => overlay.setAttribute('hidden', ''), 220);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+</script>
 
 </body>
 </html>
